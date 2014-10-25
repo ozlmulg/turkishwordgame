@@ -1,8 +1,9 @@
 from Tkinter import *
-import tkFont,pygame
-import scrabble
+from pygame.locals import *
+import tkFont,pygame,sys
+import scrabble,button
 
-class App():
+class MainMenu():
     def __init__(self):
         # create buttons!
         self.centerWindow()
@@ -33,32 +34,30 @@ def main():
     screen.resizable(width=FALSE, height=FALSE) #not resizable
     screen.configure(background="Black")#background color of screen
     screen.title("SCRABBLE GAME")#title of the screen
-    App()
+    MainMenu()
     mainloop()
 
 
 #==================== GAME MENU =====================
 
-class GameMenu(Menu):
-
-	PLAY_TURN = "play"
-	RESHUFFLE = "shuffle"
-	MAIN_MENU = "quit"
-	HINT_TURN = "hint"
-
-	def __init__(self, useHintBox = False):
-	        self.buttons = {}
-		self.rect = (570, 300, 150, 300)
-		self.background = (0, 0, 0)
-		self.buttons[GameMenu.PLAY_TURN] = Button("PLAY", (570, 300, 150, 30))
-		self.buttons[GameMenu.RESHUFFLE] = Button("SHUFFLE", (570, 340, 150, 30))
-		self.buttons[GameMenu.MAIN_MENU] = Button("QUIT", (570, 380, 150, 30))
-		SCREEN.fill((0,0,0))
+class GameMenu():
+	def __init__(self):
+	    global SCREEN
+	    SCREEN = scrabble.getScreen()
+	    SCREEN.fill((0,0,0))
 	    
-	def redraw(self):
-		pygame.draw.rect(SCREEN, self.background, self.rect)
-		for button in self.buttons.values():
-			button.redraw()		
-			
-			
+	#Update the display and show the button
+	def createButtons(self):
+	    #global SCREEN
+	    SCREEN.fill((0,0,0))
+	    global playButton,shuffleButton,exitButton
+	    playButton = button.Button()
+	    shuffleButton = button.Button()
+	    exitButton = button.Button()
+	    
+	    #Parameters:               surface,      color, x,   y,   length, height, width,    text,      text_color
+	    playButton.create_button(SCREEN, (0,128,255), 600, 290, 120,    40,    0,    "Play", (255,255,255))
+	    shuffleButton.create_button(SCREEN, (0,128,255), 600, 350, 120,    40,    0,  "Shuffle", (255,255,255))
+	    exitButton.create_button(SCREEN, (0,128,255), 600, 410, 120,    40,    0,     "Back", (255,255,255))
+		
     

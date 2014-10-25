@@ -13,7 +13,7 @@ class Tile:
 	    self.points = points
 	    
     def draw(self, left, top, highlight = False):
-	    SCREEN = scrabble.getScreen()
+	    SCREEN = scrabble.Scrabble.getScreen()
 	    LETTER_FONT = pygame.font.Font('freesansbold.ttf', 24)
 	    POINTS_FONT = pygame.font.Font('freesansbold.ttf', 7)   	    
 	    if highlight:
