@@ -1,3 +1,4 @@
+# -*- coding: cp1254 -*-
 import pygame,scrabble
 
 class Tile:
@@ -6,6 +7,8 @@ class Tile:
     SQUARE_BORDER = 4   
     TILE_OUTLINE = (55, 46, 40)
     TILE_HIGHLIGHT = (100, 100, 255) 
+    TILE_BLANK = (110, 92, 80)
+    ILE_COLOR = (255, 255, 51)
  
 
     def __init__(self, letter, points):
@@ -13,13 +16,13 @@ class Tile:
 	    self.points = points
 	    
     def draw(self, left, top, highlight = False):
-	    SCREEN = scrabble.Scrabble.getScreen()
+	    SCREEN = scrabble.getScreen()
 	    LETTER_FONT = pygame.font.Font('freesansbold.ttf', 24)
 	    POINTS_FONT = pygame.font.Font('freesansbold.ttf', 7)   	    
 	    if highlight:
-		    pygame.draw.rect(SCREEN, None , (left, top, Tile.SQUARE_SIZE, Tile.SQUARE_SIZE))
+		    pygame.draw.rect(SCREEN, Tile.TILE_HIGHLIGHT, (left, top, Tile.SQUARE_SIZE, Tile.SQUARE_SIZE))
 	    else:
-		    pygame.draw.rect(SCREEN, None , (left+1, top+1, Tile.SQUARE_SIZE-2, Tile.SQUARE_SIZE-2))
+		    pygame.draw.rect(SCREEN, Tile.TILE_OUTLINE, (left+1, top+1, Tile.SQUARE_SIZE-2, Tile.SQUARE_SIZE-2))
 		    
 	    backColor = (0,0,0)
 	    pygame.draw.rect(SCREEN, backColor, (left+2, top+2, Tile.SQUARE_SIZE-4, Tile.SQUARE_SIZE-4))

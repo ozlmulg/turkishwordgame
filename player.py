@@ -4,7 +4,7 @@ execute the actions of the player by either GUI interaction or algorithm
 '''
 
 import pygame, time
-import board, tile, bag, aistats, heuristic
+import board, tile, bag
 from pygame.locals import *
 
 class Player:
@@ -31,7 +31,7 @@ class Player:
 	def initialize():
 		Player.FONT = pygame.font.Font('freesansbold.ttf', 18)
 		Player.initialized = True
-		Player.aiStats = aistats.AIStats()	
+		#Player.aiStats = aistats.AIStats()	
 	
 	
 	'''
@@ -49,20 +49,20 @@ class Player:
 		self.lastScorePulse = 0
 		self.lastScore = 0
 		
-		self.usageLimit = self.theBoard.dictionary.difficultyToUsage(theDifficulty)
+		#self.usageLimit = self.theBoard.dictionary.difficultyToUsage(theDifficulty)
 		
-		print str(theDifficulty)+", "+str(self.usageLimit)
+		#print str(theDifficulty)+", "+str(self.usageLimit)
 		
-		if theHeuristic == None:
-			self.heuristic = heuristic.Heuristic()
-		else:
-			self.heuristic = theHeuristic
+		#if theHeuristic == None:
+			#self.heuristic = heuristic.Heuristic()
+		#else:
+			#self.heuristic = theHeuristic
 		
-		#start with a full set of tiles
+		##start with a full set of tiles
 		self.grab()
 			
 		
-	def drawTray(self, DISPLAYSURF):
+	def drawTray(self, SCREEN):
 		return None		
 		
 	'''
@@ -74,3 +74,23 @@ class Player:
 			value += tile.points
 		return value
 		
+	'''
+	Returns False if the player tries to draw new tiles and none exist in the bag (i.e. the
+	game is finished), True if either tiles were successfully removed, or the tray isn't empty 
+	'''	
+	def grab(self):
+		
+		if not self.theBag.isEmpty() :
+			
+			#Attempt to withdraw the needed number of tiles
+			numNeeded = Player.TRAY_SIZE-len(self.tray)
+			for i in range(numNeeded):
+				newTile = self.theBag.take()
+				if newTile != None:
+					self.tray.append(newTile)
+			
+		#If the bag was empty AND our tray is empty, signal that play is over		
+		elif len(self.tray) == 0:
+			return False
+			
+		return True		
