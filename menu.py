@@ -14,9 +14,13 @@ class MainMenu():
         self.helpbutton.place(relx=0.5, rely=0.5, anchor=CENTER)
         self.exitbutton = Button(text=u"ÇIKIÞ",height=3,width=20, bg="Red", fg="Black",font=tkFont.Font(family="Times", size=12, weight=tkFont.BOLD),command=screen.destroy)
         self.exitbutton.place(relx=0.5, rely=0.7, anchor=CENTER)
+	
+	
     def runGame(self):
         screen.destroy()
         scrabble.main()#close the menu and start game
+	
+	
     def centerWindow(self):            
         w = 800
         h = 700
@@ -27,6 +31,7 @@ class MainMenu():
         x = (sw - w)/2
         y = (sh - h)/2
         screen.geometry('%dx%d+%d+%d' % (w, h, x, y))    
+
  
 def main():       
     #create main screen!        
@@ -47,10 +52,11 @@ class GameMenu():
 	    SCREEN = scrabble.getScreen()
 	    SCREEN.fill((0,0,0))
 	    
+	    
 	#Update the display and show the button
 	def createButtons(self):
 	    #global SCREEN
-	    global playButton,shuffleButton,exitButton
+	    global playButton,changeButton,backButton
 	    playButton = button.Button()
 	    changeButton = button.Button()
 	    backButton = button.Button()

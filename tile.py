@@ -24,7 +24,7 @@ class Tile:
 	    else:
 		    pygame.draw.rect(SCREEN, Tile.TILE_OUTLINE, (left+1, top+1, Tile.SQUARE_SIZE-2, Tile.SQUARE_SIZE-2))
 		    
-	    backColor = (0,0,0)
+	    backColor = self.ILE_COLOR
 	    pygame.draw.rect(SCREEN, backColor, (left+2, top+2, Tile.SQUARE_SIZE-4, Tile.SQUARE_SIZE-4))
 	    
 	    #Display the letter of the tile
@@ -37,4 +37,4 @@ class Tile:
 	    pointsText = POINTS_FONT.render(str(self.points), True, Tile.TILE_OUTLINE, backColor)
 	    pointsRect = pointsText.get_rect()
 	    pointsRect.center = (left + Tile.SQUARE_SIZE/2 + Tile.SQUARE_SIZE/3, top + Tile.SQUARE_SIZE/2 + Tile.SQUARE_SIZE/3)
-	    SCREEN.blit(pointsText, pointsRect)	
+	    SCREEN.blit(pointsText, pointsRect)

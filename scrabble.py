@@ -6,7 +6,7 @@ import board,bag,menu,human
 def main():
   
     display() #display screen!
-    draw()
+    draw()#draw game board,game menu and player tiles
     
     while True: #show SCREEN until not close
 	for event in pygame.event.get(): #get event from pygame
@@ -22,11 +22,12 @@ def main():
 		    print "Back pressed!"		
         pygame.display.update()    
 
+
 # ####################################DRAW#############################################
 def draw():
     tilebag = bag.Bag() #create a bag of tiles
     gameboard = board.Board()#crate game board        
-    gamemenu = menu.GameMenu()
+    gamemenu = menu.GameMenu()#create game menu
    	
     # ######## tile trial #######
     players = []
@@ -40,10 +41,12 @@ def draw():
     gamemenu.createButtons() #draw game menu	
 
 # ####################################DRAW#############################################
+ 
     
 #retun global SCREEN
 def getScreen():
     return SCREEN
+
 
 #Create a display
 def display():
@@ -53,6 +56,7 @@ def display():
     size = (800,700) #size of the SCREEN   
     SCREEN = pygame.display.set_mode(size) # show SCREEN     
     pygame.display.set_caption("SCRABBLE") #name of the window
+
 
 #initially create main menu
 if __name__ == '__main__': # if the SCREEN module is firstly run then call the main of menu.
