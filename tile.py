@@ -8,7 +8,7 @@ class Tile:
     TILE_OUTLINE = (55, 46, 40)
     TILE_HIGHLIGHT = (100, 100, 255) 
     TILE_BLANK = (110, 92, 80)
-    ILE_COLOR = (255, 255, 51)
+    TILE_COLOR = (255, 255, 51)
  
 
     def __init__(self, letter, points):
@@ -24,7 +24,7 @@ class Tile:
 	    else:
 		    pygame.draw.rect(SCREEN, Tile.TILE_OUTLINE, (left+1, top+1, Tile.SQUARE_SIZE-2, Tile.SQUARE_SIZE-2))
 		    
-	    backColor = self.ILE_COLOR
+	    backColor = self.TILE_COLOR
 	    pygame.draw.rect(SCREEN, backColor, (left+2, top+2, Tile.SQUARE_SIZE-4, Tile.SQUARE_SIZE-4))
 	    
 	    #Display the letter of the tile

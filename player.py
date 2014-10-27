@@ -41,7 +41,7 @@ class Player:
 		if not Player.initialized:
 			Player.initialize()
 		
-		self.tray = []
+		self.tray = []  #table of player
 		self.score = 0
 		self.name = name
 		self.theBoard = theBoard
@@ -78,16 +78,16 @@ class Player:
 	Returns False if the player tries to draw new tiles and none exist in the bag (i.e. the
 	game is finished), True if either tiles were successfully removed, or the tray isn't empty 
 	'''	
-	def grab(self):
+	def grab(self):#take a tile from bag
 		
-		if not self.theBag.isEmpty() :
+		if not self.theBag.isEmpty() : #take tile with necessary
 			
 			#Attempt to withdraw the needed number of tiles
 			numNeeded = Player.TRAY_SIZE-len(self.tray)
 			for i in range(numNeeded):
 				newTile = self.theBag.take()
 				if newTile != None:
-					self.tray.append(newTile)
+					self.tray.append(newTile)#add taken tile to player
 			
 		#If the bag was empty AND our tray is empty, signal that play is over		
 		elif len(self.tray) == 0:
