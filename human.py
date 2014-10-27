@@ -44,8 +44,11 @@ class Human(player.Player):
 			else:
 				highlight = False
 			
+			t.setCoordinate((left,top))
 			t.draw(left, top, highlight)	
 			i += 1
 
-
-	
+# #####################################
+	def getTray(self):
+		self.tray
+# #####################################

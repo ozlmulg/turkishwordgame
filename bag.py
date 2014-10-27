@@ -61,5 +61,5 @@ class Bag:
 			
 	def add(self, letter, points, n):
 		for i in range(n):
-			self.tiles.append(tile.Tile(letter, points))
+			self.tiles.append(tile.Tile(letter, points ,(None,None)))
 		

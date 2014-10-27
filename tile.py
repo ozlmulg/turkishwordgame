@@ -11,9 +11,10 @@ class Tile:
     TILE_COLOR = (255, 255, 51)
  
 
-    def __init__(self, letter, points):
+    def __init__(self, letter, points,coordinate):
 	    self.letter = letter
 	    self.points = points
+	    self.coordinate=coordinate
 	    
     def draw(self, left, top, highlight = False):
 	    SCREEN = scrabble.getScreen()
@@ -38,3 +39,8 @@ class Tile:
 	    pointsRect = pointsText.get_rect()
 	    pointsRect.center = (left + Tile.SQUARE_SIZE/2 + Tile.SQUARE_SIZE/3, top + Tile.SQUARE_SIZE/2 + Tile.SQUARE_SIZE/3)
 	    SCREEN.blit(pointsText, pointsRect)
+	
+# #####################################   	    
+    def setCoordinate(self,coordinate):
+            self.coordinate = coordinate
+# #####################################
