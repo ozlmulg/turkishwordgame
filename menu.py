@@ -54,7 +54,7 @@ class GameMenu():
 	    
 	    
 	#Update the display and show the button
-	def createButtons(self):
+	def draw(self):
 	    #global SCREEN
 	    global playButton,changeButton,backButton
 	    playButton = button.Button()

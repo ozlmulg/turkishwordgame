@@ -16,28 +16,28 @@ class Tile:
 	    self.points = points
 	    self.coordinate=coordinate
 	    
-    def draw(self, left, top, highlight = False):
+    def draw(self, highlight = False):
 	    SCREEN = scrabble.getScreen()
 	    LETTER_FONT = pygame.font.Font('freesansbold.ttf', 24)
 	    POINTS_FONT = pygame.font.Font('freesansbold.ttf', 7)   	    
 	    if highlight:
-		    pygame.draw.rect(SCREEN, Tile.TILE_HIGHLIGHT, (left, top, Tile.SQUARE_SIZE, Tile.SQUARE_SIZE))
+		    pygame.draw.rect(SCREEN, Tile.TILE_HIGHLIGHT, (self.coordinate[0], self.coordinate[1], Tile.SQUARE_SIZE, Tile.SQUARE_SIZE))
 	    else:
-		    pygame.draw.rect(SCREEN, Tile.TILE_OUTLINE, (left+1, top+1, Tile.SQUARE_SIZE-2, Tile.SQUARE_SIZE-2))
+		    pygame.draw.rect(SCREEN, Tile.TILE_OUTLINE, (self.coordinate[0]+1, self.coordinate[1]+1, Tile.SQUARE_SIZE-2, Tile.SQUARE_SIZE-2))
 		    
 	    backColor = self.TILE_COLOR
-	    pygame.draw.rect(SCREEN, backColor, (left+2, top+2, Tile.SQUARE_SIZE-4, Tile.SQUARE_SIZE-4))
+	    pygame.draw.rect(SCREEN, backColor, (self.coordinate[0]+2, self.coordinate[1]+2, Tile.SQUARE_SIZE-4, Tile.SQUARE_SIZE-4))
 	    
 	    #Display the letter of the tile
 	    letterText = LETTER_FONT.render(self.letter, True, Tile.TILE_OUTLINE, backColor)
 	    letterRect = letterText.get_rect()
-	    letterRect.center = (left + Tile.SQUARE_SIZE/2 - 3, top + Tile.SQUARE_SIZE/2)
+	    letterRect.center = (self.coordinate[0] + Tile.SQUARE_SIZE/2 - 3, self.coordinate[1] + Tile.SQUARE_SIZE/2)
 	    SCREEN.blit(letterText, letterRect)
     
 	    #Display the points of the tile
 	    pointsText = POINTS_FONT.render(str(self.points), True, Tile.TILE_OUTLINE, backColor)
 	    pointsRect = pointsText.get_rect()
-	    pointsRect.center = (left + Tile.SQUARE_SIZE/2 + Tile.SQUARE_SIZE/3, top + Tile.SQUARE_SIZE/2 + Tile.SQUARE_SIZE/3)
+	    pointsRect.center = (self.coordinate[0] + Tile.SQUARE_SIZE/2 + Tile.SQUARE_SIZE/3, self.coordinate[1] + Tile.SQUARE_SIZE/2 + Tile.SQUARE_SIZE/3)
 	    SCREEN.blit(pointsText, pointsRect)
 	
 # #####################################   	    

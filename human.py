@@ -13,6 +13,7 @@ class Human(player.Player):
 	TRAY_TOP = 550
 	TRAY_FIRSTLEFT = TRAY_LEFT + tile.Tile.SQUARE_BORDER + tile.Tile.SQUARE_SIZE * .5
 	TRAY_FIRSTTOP = TRAY_TOP + tile.Tile.SQUARE_BORDER
+	FIRST_TIME = True
 	
 	'''
 	Initialize the human-controlled player (currently does nothing but call's player initialization)
@@ -33,20 +34,25 @@ class Human(player.Player):
 						(tile.Tile.SQUARE_SIZE + tile.Tile.SQUARE_BORDER)*8, 
 						tile.Tile.SQUARE_SIZE + tile.Tile.SQUARE_BORDER*2))
 			
+			
 		#Draw each tile
 		i = 0
 		for t in self.tray:
-			top = Human.TRAY_FIRSTTOP
-			left = (Human.TRAY_FIRSTLEFT + (i * (tile.Tile.SQUARE_SIZE + tile.Tile.SQUARE_BORDER)))
+			if self.FIRST_TIME == True:
+				top = Human.TRAY_FIRSTTOP
+				left = (Human.TRAY_FIRSTLEFT + (i * (tile.Tile.SQUARE_SIZE + tile.Tile.SQUARE_BORDER)))
+				t.setCoordinate((left,top))
 			
 			if i == self.hand:
 				highlight = True
 			else:
 				highlight = False
 			
-			t.setCoordinate((left,top))
-			t.draw(left, top, highlight)	
+			t.draw(highlight)	
 			i += 1
+			
+			
+		self.FIRST_TIME=False
 
 # #####################################
 	def getTray(self):

@@ -8,7 +8,7 @@ def main():
     display() #display screen!
     draw()#draw game board,game menu and player tiles
 # #############################################################
-    RenderList=[] # list of objects
+    #RenderList=[] # list of objects
     MousePressed=False # Pressed down THIS FRAME
     MouseDown=False # mouse is held down
     MouseReleased=False # Released THIS FRAME
@@ -40,36 +40,46 @@ def main():
 		MouseReleased=True
 		MouseDown=False	 
 		
-	    if MousePressed==True:
-		for item in players[active].getTray(): # search all items
-		    if (pos[0]>=(item.coordinate[0]-item.SQUARE_SIZE) and 
-		        pos[0]<=(item.coordinate[0]+item.SQUARE_SIZE) and 
-		        pos[1]>=(item.coordinate[1]-item.SQUARE_SIZE) and 
-		        pos[1]<=(item.coordinate[1]+item.SQUARE_SIZE) ): # inside the bounding box
-			Target=item # "pick up" item
-		
-		
-		#if Target is None: # didn't find any?
-		    #Target=Disk((0,0,255),coordinate,32) # create a new one
-		    #RenderList.append(Target) # add to list of things to draw
-		
-	    if MouseDown and Target is not None: # if we are dragging something
-		Target.coordinate=coordinate # move the target with us
+	if MousePressed==True:
+	    for item in players[active].tray: # search all items
+		if (pos[0]>=(item.coordinate[0]-item.SQUARE_SIZE) and 
+	            pos[0]<=(item.coordinate[0]+item.SQUARE_SIZE) and 
+	            pos[1]>=(item.coordinate[1]-item.SQUARE_SIZE) and 
+	            pos[1]<=(item.coordinate[1]+item.SQUARE_SIZE) ): # inside the bounding box
+		    Target=item # "pick up" item
 	    
-	    if MouseReleased:
-		Target=None # Drop item, if we have any
-		
-	    players[active].drawTray(SCREEN)#draw tiles of the player
-		
-	    MousePressed=False # Reset these to False
-	    MouseReleased=False # Ditto 	    
+	    
+	    #if Target is None: # didn't find any?
+		#Target=Disk((0,0,255),coordinate,32) # create a new one
+		#RenderList.append(Target) # add to list of things to draw
+	    
+	if MouseDown and Target is not None: # if we are dragging something
+	    Target.coordinate=pos # move the target with us
+	
+	if MouseReleased:
+	    Target=None # Drop item, if we have any
+	    
+	    
+	MousePressed=False # Reset these to False
+	MouseReleased=False # Ditto
+
+# ###############
+	gameboard.draw()
+	players[active].drawTray(SCREEN)#draw tiles of the player ## SILINECEK NOT: BU KOD SATIRININ YERI ONEMLI  
+	gamemenu.draw() #draw game menu
+# #############
         pygame.display.update()    
 
 
 # ####################################DRAW#############################################
 def draw():
     tilebag = bag.Bag() #create a bag of tiles
-    gameboard = board.Board()#crate game board        
+# ############
+    global gameboard
+    gameboard = board.Board()#crate game board
+# ###########
+
+    global gamemenu
     gamemenu = menu.GameMenu()#create game menu
    	
     # ######## tile trial #######
@@ -81,9 +91,9 @@ def draw():
     
     # ########### tile trial end  ################
     
-    gameboard.draw() #draw game board
+    #gameboard.draw() #draw game board
     #players[active].drawTray(SCREEN)#draw tiles of the player
-    gamemenu.createButtons() #draw game menu	
+    #gamemenu.createButtons() #draw game menu	
 
 # ####################################DRAW#############################################
  
