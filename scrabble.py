@@ -2,13 +2,14 @@ import pygame,sys
 from pygame.locals import *
 import board,bag,menu,human,tile
 
+
 #Run the game
 def main():
   
     display() #display screen!
     draw()#draw game board,game menu and player tiles
 # #############################################################
-    #RenderList=[] # list of objects
+    RenderList=[] # list of objects
     MousePressed=False # Pressed down THIS FRAME
     MouseDown=False # mouse is held down
     MouseReleased=False # Released THIS FRAME
@@ -16,7 +17,9 @@ def main():
 # ################################################################
 
     while True: #show SCREEN until not close
-	SCREEN.fill((0,0,0)) # clear screen
+	#SCREEN.fill((0,0,0)) # clear screen
+	SCREEN.blit(asurf, imagerect)
+	
 	pos=pygame.mouse.get_pos()
 	
 	for event in pygame.event.get(): #get event from pygame
@@ -33,40 +36,39 @@ def main():
 		    print "Back pressed!"
 		    
 	    if event.type == pygame.MOUSEBUTTONDOWN:
-		MousePressed=True 
-		MouseDown=True 
+		MousePressed = True 
+		MouseDown = True 
 			   
 	    if event.type == pygame.MOUSEBUTTONUP:
-		MouseReleased=True
-		MouseDown=False	 
+		MouseReleased = True
+		MouseDown = False	 
 		
-	if MousePressed==True:
-	    for item in players[active].tray: # search all items
-		if (pos[0]>=(item.coordinate[0]-item.SQUARE_SIZE) and 
-	            pos[0]<=(item.coordinate[0]+item.SQUARE_SIZE) and 
-	            pos[1]>=(item.coordinate[1]-item.SQUARE_SIZE) and 
-	            pos[1]<=(item.coordinate[1]+item.SQUARE_SIZE) ): # inside the bounding box
-		    Target=item # "pick up" item
+	    if MousePressed == True:
+		for item in players[active].tray: # search all items
+		    if (pos[0] >= (item.coordinate[0]) and # ######## Changed
+		        pos[0] <= (item.coordinate[0] + item.SQUARE_SIZE) and 
+		        pos[1] >= (item.coordinate[1]) and # ######## Changed
+		        pos[1] <= (item.coordinate[1] + item.SQUARE_SIZE) ): # inside the bounding box
+			Target=item # "pick up" item
+		
+		
+		#if Target is None: # didn't find any?
+		    #Target=Disk((0,0,255),coordinate,32) # create a new one
+		    #RenderList.append(Target) # add to list of things to draw
+		
+	    if MouseDown and Target is not None: # if we are dragging something
+		Target.coordinate = (pos[0] - tile.Tile.SQUARE_SIZE/2, pos[1] - tile.Tile.SQUARE_SIZE/2) # move the target with us ############Holds the tile from the middle
 	    
-	    
-	    #if Target is None: # didn't find any?
-		#Target=Disk((0,0,255),coordinate,32) # create a new one
-		#RenderList.append(Target) # add to list of things to draw
-	    
-	if MouseDown and Target is not None: # if we are dragging something
-	    Target.coordinate=pos # move the target with us
-	
-	if MouseReleased:
-	    Target=None # Drop item, if we have any
-	    
-	    
-	MousePressed=False # Reset these to False
-	MouseReleased=False # Ditto
+	    if MouseReleased:
+		Target = None # Drop item, if we have any
+		
+		
+	    MousePressed = False # Reset these to False
+	    MouseReleased = False # Ditto
 
 # ###############
-	gameboard.draw()
-	players[active].drawTray(SCREEN)#draw tiles of the player ## SILINECEK NOT: BU KOD SATIRININ YERI ONEMLI  
-	gamemenu.draw() #draw game menu
+	#gameboard.draw()
+	players[active].drawTray(SCREEN)#draw tiles of the player ## SILINECEK NOT: BU KOD SATIRININ YERI ONEMLI   
 # #############
         pygame.display.update()    
 
@@ -79,8 +81,14 @@ def draw():
     gameboard = board.Board()#crate game board
 # ###########
 
-    global gamemenu
+
     gamemenu = menu.GameMenu()#create game menu
+    global asurf
+    global imagerect
+    asurf = pygame.image.load('Board.jpg')
+    imagerect = asurf.get_rect()
+    SCREEN.fill((0,0,0))
+    SCREEN.blit(asurf, imagerect)
    	
     # ######## tile trial #######
     global players
@@ -91,9 +99,9 @@ def draw():
     
     # ########### tile trial end  ################
     
-    #gameboard.draw() #draw game board
-    #players[active].drawTray(SCREEN)#draw tiles of the player
-    #gamemenu.createButtons() #draw game menu	
+    gameboard.draw() #draw game board
+    players[active].drawTray(SCREEN)#draw tiles of the player
+    gamemenu.createButtons() #draw game menu	
 
 # ####################################DRAW#############################################
  
