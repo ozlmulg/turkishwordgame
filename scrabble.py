@@ -50,6 +50,7 @@ def main():
 		        pos[1] >= (item.coordinate[1]) and # ######## Changed
 		        pos[1] <= (item.coordinate[1] + item.SQUARE_SIZE) ): # inside the bounding box
 			Target=item # "pick up" item
+			break
 		
 		
 		#if Target is None: # didn't find any?
@@ -60,7 +61,19 @@ def main():
 		Target.coordinate = (pos[0] - tile.Tile.SQUARE_SIZE/2, pos[1] - tile.Tile.SQUARE_SIZE/2) # move the target with us ############Holds the tile from the middle
 	    
 	    if MouseReleased:
+		# ##############################
+		if (Target.coordinate[0]%36-5) <= tile.Tile.SQUARE_SIZE/2 and (Target.coordinate[1]%36-5) <= tile.Tile.SQUARE_SIZE/2:
+		    Target.coordinate = ((Target.coordinate[0] - (Target.coordinate[0] % 36)) + 5, (Target.coordinate[1] - (Target.coordinate[1] % 36)) + 5)
+		elif(Target.coordinate[0]%36-5) > tile.Tile.SQUARE_SIZE/2 and (Target.coordinate[1]%36-5) <= tile.Tile.SQUARE_SIZE/2:
+		    Target.coordinate = ((Target.coordinate[0] + (36-Target.coordinate[0]%36)) + 5, (Target.coordinate[1] - (Target.coordinate[1] % 36)) + 5)
+		elif(Target.coordinate[0]%36-5) <= tile.Tile.SQUARE_SIZE/2 and (Target.coordinate[1]%36-5) > tile.Tile.SQUARE_SIZE/2:
+		    Target.coordinate = ((Target.coordinate[0] - (Target.coordinate[0] % 36)) + 5, (Target.coordinate[1] + (36-Target.coordinate[1]%36)) + 5)
+		elif(Target.coordinate[0]%36-5) > tile.Tile.SQUARE_SIZE/2 and (Target.coordinate[1]%36-5) > tile.Tile.SQUARE_SIZE/2:
+		    Target.coordinate = ((Target.coordinate[0] + (36-Target.coordinate[0]%36)) + 5, (Target.coordinate[1] + (36-Target.coordinate[1]%36)) + 5)
+		# ##############################
+				    
 		Target = None # Drop item, if we have any
+		
 		
 		
 	    MousePressed = False # Reset these to False
