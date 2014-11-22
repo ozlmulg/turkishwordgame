@@ -20,9 +20,16 @@ def main():
 # #####################
     #playedTiles = []
 # #####################
+    Target=None # target of Drag/Drop 
     while True: #show SCREEN until not close
-	#SCREEN.fill((0,0,0)) # clear screen
-	SCREEN.blit(asurf, imagerect)
+	
+	#SCREEN.blit(asurf, imagerect)
+	# #####################################
+	SCREEN.fill((0,0,0)) # clear screen
+	SCREEN.blit(asurf.convert_alpha(),[0,0])
+	gamemenu.createButtons() #draw game menu
+	# ####################################
+	
 	pos=pygame.mouse.get_pos()
 
 	
@@ -54,6 +61,7 @@ def main():
 		        pos[1] >= (item.coordinate[1]) and # ######## Changed
 		        pos[1] <= (item.coordinate[1] + item.SQUARE_SIZE) ): # inside the bounding box
 			Target=item # "pick up" item
+			Target.oldPos = Target.coordinate[:]
 			# ##############################################SWAP##############
 			indexofTarget = players[active].tray.index(Target)
 			temp = players[active].tray[-1] #last element of tray
@@ -80,7 +88,9 @@ def main():
 	    
 	    if MouseReleased and Target is not None:
 		# ##############################
-		if (Target.coordinate[0]%36-5) <= tile.Tile.SQUARE_SIZE/2 and (Target.coordinate[1]%36-5) <= tile.Tile.SQUARE_SIZE/2:
+		if Target.coordinate[0] >= board.Board.GRID_SIZE * (board.Board.SQUARE_SIZE + board.Board.SQUARE_BORDER) + 1 or Target.coordinate[1] >= board.Board.GRID_SIZE * (board.Board.SQUARE_SIZE + board.Board.SQUARE_BORDER) + 1:
+				    Target.coordinate = Target.oldPos		
+		elif (Target.coordinate[0]%36-5) <= tile.Tile.SQUARE_SIZE/2 and (Target.coordinate[1]%36-5) <= tile.Tile.SQUARE_SIZE/2:
 		    Target.coordinate = ((Target.coordinate[0] - (Target.coordinate[0] % 36)) + 5, (Target.coordinate[1] - (Target.coordinate[1] % 36)) + 5)
 		elif(Target.coordinate[0]%36-5) > tile.Tile.SQUARE_SIZE/2 and (Target.coordinate[1]%36-5) <= tile.Tile.SQUARE_SIZE/2:
 		    Target.coordinate = ((Target.coordinate[0] + (36-Target.coordinate[0]%36)) + 5, (Target.coordinate[1] - (Target.coordinate[1] % 36)) + 5)
@@ -125,14 +135,15 @@ def draw():
     gameboard = board.Board()#crate game board
 # ###########
 
-
+    global gamemenu
     gamemenu = menu.GameMenu()#create game menu
     global asurf
     global imagerect
     asurf = pygame.image.load('Board.jpg')
-    imagerect = asurf.get_rect()
+    #imagerect = asurf.get_rect()
     SCREEN.fill((0,0,0))
-    SCREEN.blit(asurf, imagerect)
+    #SCREEN.blit(asurf.convert_alpha(),[0,0])
+    #SCREEN.blit(asurf, imagerect)
    	
     # ######## tile trial #######
     global players

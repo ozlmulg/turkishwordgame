@@ -15,6 +15,9 @@ class Tile:
 	    self.letter = letter
 	    self.points = points
 	    self.coordinate=coordinate
+	    #
+	    self.oldPos=coordinate
+	    #
 	    
     def draw(self, highlight = False):
 	    SCREEN = scrabble.getScreen()
