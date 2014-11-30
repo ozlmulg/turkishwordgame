@@ -15,12 +15,17 @@ def main():
     MouseReleased=False # Released THIS FRAME
     Target=None # target of Drag/Drop    
 # ################################################################
-    global tilem
-    tilem = None
+    #global tilem
+    #tilem = None
 # #####################
-    #playedTiles = []
+    playedTiles = []
 # #####################
     Target=None # target of Drag/Drop 
+    # ##############save initial image
+    global asurf
+    asurf = pygame.image.load('Board.jpg')   
+    # ##############
+    # ###############
     while True: #show SCREEN until not close
 	
 	#SCREEN.blit(asurf, imagerect)
@@ -41,6 +46,16 @@ def main():
 	    if event.type == MOUSEBUTTONDOWN:
 		if menu.playButton.pressed(pygame.mouse.get_pos()):
 		    print "Play pressed!"
+		    # #################save image when it placed#########
+		    players[active].drawTray(SCREEN)
+		    for Target in playedTiles:
+			players[active].tray.remove(Target)		    
+		    playedTiles = []
+		    rect = pygame.Rect(0, 0, 545, 545)
+		    sub = SCREEN.subsurface(rect)
+		    pygame.image.save(sub, "Board.png")
+		    asurf = pygame.image.load('Board.png')
+		    #  ##############################################	    
 		if menu.changeButton.pressed(pygame.mouse.get_pos()):
 		    print "Shuffle pressed!"
 		if menu.backButton.pressed(pygame.mouse.get_pos()):
@@ -92,21 +107,29 @@ def main():
 				    Target.coordinate = Target.oldPos		
 		elif (Target.coordinate[0]%36-5) <= tile.Tile.SQUARE_SIZE/2 and (Target.coordinate[1]%36-5) <= tile.Tile.SQUARE_SIZE/2:
 		    Target.coordinate = ((Target.coordinate[0] - (Target.coordinate[0] % 36)) + 5, (Target.coordinate[1] - (Target.coordinate[1] % 36)) + 5)
+		    # ###############will remove from tray when played#############3
+		    if(Target not in playedTiles):
+			playedTiles.append(Target)
+		    # ######################################################
 		elif(Target.coordinate[0]%36-5) > tile.Tile.SQUARE_SIZE/2 and (Target.coordinate[1]%36-5) <= tile.Tile.SQUARE_SIZE/2:
 		    Target.coordinate = ((Target.coordinate[0] + (36-Target.coordinate[0]%36)) + 5, (Target.coordinate[1] - (Target.coordinate[1] % 36)) + 5)
+		    if(Target not in playedTiles):
+		        playedTiles.append(Target)
 		elif(Target.coordinate[0]%36-5) <= tile.Tile.SQUARE_SIZE/2 and (Target.coordinate[1]%36-5) > tile.Tile.SQUARE_SIZE/2:
 		    Target.coordinate = ((Target.coordinate[0] - (Target.coordinate[0] % 36)) + 5, (Target.coordinate[1] + (36-Target.coordinate[1]%36)) + 5)
+		    if(Target not in playedTiles):
+		        playedTiles.append(Target)
 		elif(Target.coordinate[0]%36-5) > tile.Tile.SQUARE_SIZE/2 and (Target.coordinate[1]%36-5) > tile.Tile.SQUARE_SIZE/2:
 		    Target.coordinate = ((Target.coordinate[0] + (36-Target.coordinate[0]%36)) + 5, (Target.coordinate[1] + (36-Target.coordinate[1]%36)) + 5)
+		    if(Target not in playedTiles):
+		        playedTiles.append(Target)
 		# ##############################
 		# ############
-		'''
-		if(Target in players[active].tray):
-		    players[active].tray.remove(Target)
-		    playedTiles.append(Target)
-	        '''
-
 		
+		#if(Target in players[active].tray):
+		    #players[active].tray.remove(Target)
+		    #playedTiles.append(Target)
+
 		# ############
 		#Target.draw(False)
 		#tilem = Target
@@ -119,6 +142,7 @@ def main():
 # ###############
 	#gameboard.draw()
 	players[active].drawTray(SCREEN)#draw tiles of the player ## SILINECEK NOT: BU KOD SATIRININ YERI ONEMLI 
+	
 	'''
 	for item in playedTiles:
 	    item.draw(False)
@@ -137,9 +161,9 @@ def draw():
 
     global gamemenu
     gamemenu = menu.GameMenu()#create game menu
-    global asurf
-    global imagerect
-    asurf = pygame.image.load('Board.jpg')
+    #global asurf
+    #global imagerect
+    #asurf = pygame.image.load('Board.jpg')
     #imagerect = asurf.get_rect()
     SCREEN.fill((0,0,0))
     #SCREEN.blit(asurf.convert_alpha(),[0,0])
