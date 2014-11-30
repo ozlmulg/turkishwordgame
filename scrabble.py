@@ -15,8 +15,10 @@ def main():
     MouseReleased=False # Released THIS FRAME
     Target=None # target of Drag/Drop    
 # ################################################################
-    global tilem
-    tilem = None
+# ##############save initial image
+    global asurf
+    asurf = pygame.image.load('Board.jpg') 
+    playedTiles = []
 # ##################### All positions that any tile can be at and their status of occupy, both board and tray 
     
     squares = {}
@@ -36,8 +38,6 @@ def main():
 
     Target=None # target of Drag/Drop 
     while True: #show SCREEN until not close
-	
-	#SCREEN.blit(asurf, imagerect)
 	# #####################################
 	SCREEN.fill((0,0,0)) # clear screen
 	SCREEN.blit(asurf.convert_alpha(),[0,0])
@@ -55,6 +55,16 @@ def main():
 	    if event.type == MOUSEBUTTONDOWN:
 		if menu.playButton.pressed(pygame.mouse.get_pos()):
 		    print "Play pressed!"
+		    # #################save image when it placed#########
+		    players[active].drawTray(SCREEN)
+		    for Target in playedTiles:
+			players[active].tray.remove(Target)		    
+		    playedTiles = []
+		    rect = pygame.Rect(0, 0, 545, 545)
+		    sub = SCREEN.subsurface(rect)
+		    pygame.image.save(sub, "Board.png")
+		    asurf = pygame.image.load('Board.png')
+		    #  ##############################################			    
 		if menu.changeButton.pressed(pygame.mouse.get_pos()):
 		    print "Shuffle pressed!"
 		if menu.backButton.pressed(pygame.mouse.get_pos()):
@@ -86,20 +96,9 @@ def main():
 			players[active].tray[-1] = Target# now last element is Target
 			# ####################################################
 			break
-	        '''
-		for item in playedTiles: # search all items
-		    if (pos[0] >= (item.coordinate[0]) and # ######## Changed
-		        pos[0] <= (item.coordinate[0] + item.SQUARE_SIZE) and 
-		        pos[1] >= (item.coordinate[1]) and # ######## Changed
-		        pos[1] <= (item.coordinate[1] + item.SQUARE_SIZE) ): # inside the bounding box
-			Target=item # "pick up" item
-			break		
-		'''
-		
-		#if Target is None: # didn't find any?
-		    #Target=Disk((0,0,255),coordinate,32) # create a new one
-		    #RenderList.append(Target) # add to list of things to draw
-		
+
+
+
 	    if MouseDown and Target is not None: # if we are dragging something
 		Target.coordinate = (pos[0] - tile.Tile.SQUARE_SIZE/2, pos[1] - tile.Tile.SQUARE_SIZE/2) # move the target with us ############Holds the tile from the middle
 		
@@ -120,6 +119,10 @@ def main():
 			i = i + 36
 		    
 		    Target.coordinate = (Target.coordinate[0], i - 36)	
+		    # ###############will remove from tray when played#############3
+		    if(Target not in playedTiles):
+			playedTiles.append(Target)
+		    # ######################################################		    
 		    
 		# if the tile put on tray
 		elif (Target.coordinate[0] > human.Human.TRAY_LEFT and Target.coordinate[1] > human.Human.TRAY_TOP and Target.coordinate[0] < human.Human.TRAY_LEFT + (tile.Tile.SQUARE_SIZE + tile.Tile.SQUARE_BORDER)*8 and Target.coordinate[1] < human.Human.TRAY_TOP + tile.Tile.SQUARE_SIZE + tile.Tile.SQUARE_BORDER*2):
@@ -129,8 +132,11 @@ def main():
 			i = i + 36		    
 			
 		    Target.coordinate = (i - 36, human.Human.TRAY_FIRSTTOP)
-		    
-		    
+		    # ###############will remove from tray when played#############3
+		    if(Target not in playedTiles):
+			playedTiles.append(Target)
+		    # ######################################################		    
+
 		    
 		else:
 		    Target.coordinate = Target.oldPos # if tile put out of board bring it back
@@ -183,7 +189,11 @@ def main():
 			    Target.coordinate = (Target.coordinate[0], Target.coordinate[1] + 36)
 			elif slidingTo == 3:
 			    Target.coordinate = (Target.coordinate[0], Target.coordinate[1] - 36)
-			    
+		    
+		    # ###############will remove from tray when played######
+		    if(Target not in playedTiles):
+			playedTiles.append(Target)
+		    # ######################################################		    
 			
 	    # slide the tile if it is dropped on another tile
 			    
@@ -195,12 +205,8 @@ def main():
 	    MouseReleased = False # Ditto
 
 # ###############
-	#gameboard.draw()
 	players[active].drawTray(SCREEN)#draw tiles of the player ## SILINECEK NOT: BU KOD SATIRININ YERI ONEMLI 
-	'''
-	for item in playedTiles:
-	    item.draw(False)
-	'''
+	
 # #############
         pygame.display.update()    
 
@@ -208,21 +214,13 @@ def main():
 # ####################################DRAW#############################################
 def draw():
     tilebag = bag.Bag() #create a bag of tiles
-# ############
     global gameboard
     gameboard = board.Board()#crate game board
-# ###########
 
     global gamemenu
     gamemenu = menu.GameMenu()#create game menu
-    global asurf
-    global imagerect
-    asurf = pygame.image.load('Board.jpg')
-    #imagerect = asurf.get_rect()
     SCREEN.fill((0,0,0))
-    #SCREEN.blit(asurf.convert_alpha(),[0,0])
-    #SCREEN.blit(asurf, imagerect)
-   	
+    
     # ######## tile trial #######
     global players
     players = []
