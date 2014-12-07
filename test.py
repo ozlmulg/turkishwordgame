@@ -1,3 +1,17 @@
+
+#elif True:
+     # control the first element of played tiles for there are a tile in up,down,right or left of it
+    #squares[playedTiles[0]
+    #print "1:",playedTiles[0]
+    #print "2:",squares[playedTiles[0].coordinate]
+    #print "3:",playedTiles[0].coordinate	-> palyed tiles da ilk tasýn yanýnda saðýnda solunda üstünde altýnda eleman var mý diye bakicam. x ve y de 36, 36 artiyor coordinate	
+
+
+    print "0",squares[playedTiles[0]]
+    print "1:",playedTiles[0]
+    print "2:",squares[playedTiles[0].coordinate]
+    print "3:",playedTiles[0].coordinate	
+
 import pygame,sys
 
 class Disk: # Something we can create and manipulate
