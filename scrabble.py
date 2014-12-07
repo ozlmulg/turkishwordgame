@@ -1,6 +1,6 @@
 import pygame,sys
 from pygame.locals import *
-import board,bag,menu,human,tile,player
+import board, bag, menu, human, tile, player
 
 
 #Run the game
@@ -19,6 +19,8 @@ def main():
     global asurf
     asurf = pygame.image.load('Board.jpg') 
     playedTiles = []
+    isFirstMove = True
+    MIDDLE_SQUARE = (257, 257)
 # ##################### All positions that any tile can be at and their status of occupy, both board and tray 
     
     squares = {}
@@ -55,16 +57,23 @@ def main():
 	    if event.type == MOUSEBUTTONDOWN:
 		if menu.playButton.pressed(pygame.mouse.get_pos()):
 		    print "Play pressed!"
-		    # #################save image when it placed#########
-		    players[active].drawTray(SCREEN)
-		    for Target in playedTiles:
-			players[active].tray.remove(Target)		    
-		    playedTiles = []
-		    rect = pygame.Rect(0, 0, 545, 545)
-		    sub = SCREEN.subsurface(rect)
-		    pygame.image.save(sub, "Board.png")
-		    asurf = pygame.image.load('Board.png')
-		    #  ##############################################			    
+		    
+		    if isFirstMove and squares[MIDDLE_SQUARE] == 0:
+			 print "First move must be done to middle of the board"
+			 
+		    else:
+			if isFirstMove:
+			    isFirstMove = False
+			# #################save image when it placed#########
+			players[active].drawTray(SCREEN)
+			for Target in playedTiles:
+			    players[active].tray.remove(Target)		    
+			playedTiles = []
+			rect = pygame.Rect(0, 0, 545, 545)
+			sub = SCREEN.subsurface(rect)
+			pygame.image.save(sub, "Board.png")
+			asurf = pygame.image.load('Board.png')
+			#  ##############################################			    
 		if menu.changeButton.pressed(pygame.mouse.get_pos()):
 		    print "Shuffle pressed!"
 		if menu.backButton.pressed(pygame.mouse.get_pos()):
@@ -114,25 +123,27 @@ def main():
 			
 		    Target.coordinate = (i - 36, Target.coordinate[1])
 		    
+		    
 		    i = 5
 		    while i <= Target.coordinate[1] + 16 :
 			i = i + 36
 		    
 		    Target.coordinate = (Target.coordinate[0], i - 36)	
-		    # ###############will remove from tray when played#############3
+		    # ###############will remove from tray when played######
 		    if(Target not in playedTiles):
 			playedTiles.append(Target)
 		    # ######################################################		    
 		    
 		# if the tile put on tray
-		elif (Target.coordinate[0] > human.Human.TRAY_LEFT and Target.coordinate[1] > human.Human.TRAY_TOP and Target.coordinate[0] < human.Human.TRAY_LEFT + (tile.Tile.SQUARE_SIZE + tile.Tile.SQUARE_BORDER)*8 and Target.coordinate[1] < human.Human.TRAY_TOP + tile.Tile.SQUARE_SIZE + tile.Tile.SQUARE_BORDER*2):
+		elif (Target.coordinate[0] + 16 > human.Human.TRAY_LEFT and Target.coordinate[1] + 16 > human.Human.TRAY_TOP and Target.coordinate[0] + 16 < human.Human.TRAY_LEFT + (tile.Tile.SQUARE_SIZE + tile.Tile.SQUARE_BORDER)*8 and Target.coordinate[1] + 16 < human.Human.TRAY_TOP + tile.Tile.SQUARE_SIZE + tile.Tile.SQUARE_BORDER*2):
+		    onTray = True
 		    i = human.Human.TRAY_FIRSTLEFT
 		    a = Target.coordinate
 		    while i <= Target.coordinate[0] + 16 :
 			i = i + 36		    
 			
 		    Target.coordinate = (i - 36, human.Human.TRAY_FIRSTTOP)
-		    # ###############will remove from tray when played#############3
+		    # ###############will remove from tray when played######
 		    if(Target not in playedTiles):
 			playedTiles.append(Target)
 		    # ######################################################		    
@@ -146,49 +157,57 @@ def main():
 		# slide the tile if it is dropped on another tile
 		#for t in players[active].tray[:player.Player.TRAY_SIZE-1]: # search all the tray but not last element which is the tile itself
 		    #if t.coordinate == Target.coordinate:
-		slidingTo = 4
-		if squares[Target.coordinate] == 1:
-		    if Target.coordinate[0] <= a[0] and Target.coordinate[1] <= a[1]:
-			if a[0]-Target.coordinate[0]>=a[1]-Target.coordinate[1]:
-			    Target.coordinate = (Target.coordinate[0] + 36, Target.coordinate[1])
-			    slidingTo = 1
-			else:
-			    Target.coordinate = (Target.coordinate[0], Target.coordinate[1] + 36)
-			    slidingTo = 3
+		try:
+		    slidingTo = 4
+		    if squares[Target.coordinate] == 1:
+			if Target.coordinate[0] <= a[0] and Target.coordinate[1] <= a[1]:
+			    if a[0]-Target.coordinate[0]>=a[1]-Target.coordinate[1]:
+				Target.coordinate = (Target.coordinate[0] + 36, Target.coordinate[1])
+				slidingTo = 1
+			    else:
+				Target.coordinate = (Target.coordinate[0], Target.coordinate[1] + 36)
+				slidingTo = 3
+				
+			elif Target.coordinate[0] > a[0] and Target.coordinate[1] <= a[1]:
+			    if Target.coordinate[0] - a[0] >= a[1] - Target.coordinate[1]:
+				Target.coordinate = (Target.coordinate[0] - 36, Target.coordinate[1])
+				slidingTo = 0
+			    else:
+				Target.coordinate = (Target.coordinate[0], Target.coordinate[1] + 36)
+				slidingTo = 3
+				
+			elif Target.coordinate[0] > a[0] and Target.coordinate[1] > a[1]:
+			    if Target.coordinate[0] - a[0] >= Target.coordinate[1] - a[1]:
+				Target.coordinate = (Target.coordinate[0] - 36, Target.coordinate[1])
+				slidingTo = 0
+			    else:
+				Target.coordinate = (Target.coordinate[0], Target.coordinate[1] - 36)
+				slidingTo = 2
+				
+			elif Target.coordinate[0] <= a[0] and Target.coordinate[1] > a[1]:
+			    if a[0]-Target.coordinate[0] >= Target.coordinate[1] - a[1]:
+				Target.coordinate = (Target.coordinate[0] + 36, Target.coordinate[1])
+				slidingTo = 1
+			    else:
+				Target.coordinate = (Target.coordinate[0], Target.coordinate[1] - 36)
+				slidingTo = 2
+				
+			#if onTray == False: ## NOT FINISHED
+			while squares[Target.coordinate] == 1:
+			    if slidingTo == 0:
+				Target.coordinate = (Target.coordinate[0] + 36, Target.coordinate[1])
+			    elif slidingTo == 1:
+				Target.coordinate = (Target.coordinate[0] - 36, Target.coordinate[1])
+			    elif slidingTo == 2:
+				Target.coordinate = (Target.coordinate[0], Target.coordinate[1] + 36)
+			    elif slidingTo == 3:
+				Target.coordinate = (Target.coordinate[0], Target.coordinate[1] - 36)
+				    
+			#else:  # NOT FINISHED
+			    #if Target.oldPos[0] <= Target.coordinate[0]
 			    
-		    elif Target.coordinate[0] > a[0] and Target.coordinate[1] <= a[1]:
-			if Target.coordinate[0] - a[0] >= a[1] - Target.coordinate[1]:
-			    Target.coordinate = (Target.coordinate[0] - 36, Target.coordinate[1])
-			    slidingTo = 0
-			else:
-			    Target.coordinate = (Target.coordinate[0], Target.coordinate[1] + 36)
-			    slidingTo = 3
-			    
-		    elif Target.coordinate[0] > a[0] and Target.coordinate[1] > a[1]:
-			if Target.coordinate[0] - a[0] >= Target.coordinate[1] - a[1]:
-			    Target.coordinate = (Target.coordinate[0] - 36, Target.coordinate[1])
-			    slidingTo = 0
-			else:
-			    Target.coordinate = (Target.coordinate[0], Target.coordinate[1] - 36)
-			    slidingTo = 2
-			    
-		    elif Target.coordinate[0] <= a[0] and Target.coordinate[1] > a[1]:
-			if a[0]-Target.coordinate[0] >= Target.coordinate[1] - a[1]:
-			    Target.coordinate = (Target.coordinate[0] + 36, Target.coordinate[1])
-			    slidingTo = 1
-			else:
-			    Target.coordinate = (Target.coordinate[0], Target.coordinate[1] - 36)
-			    slidingTo = 2
-			    
-		    while squares[Target.coordinate] == 1:
-			if slidingTo == 0:
-			    Target.coordinate = (Target.coordinate[0] + 36, Target.coordinate[1])
-			elif slidingTo == 1:
-			    Target.coordinate = (Target.coordinate[0] - 36, Target.coordinate[1])
-			elif slidingTo == 2:
-			    Target.coordinate = (Target.coordinate[0], Target.coordinate[1] + 36)
-			elif slidingTo == 3:
-			    Target.coordinate = (Target.coordinate[0], Target.coordinate[1] - 36)
+		except KeyError:
+		    Target.coordinate = Target.oldPos # if tile slid out of board bring it back		    
 		    
 		    # ###############will remove from tray when played######
 		    if(Target not in playedTiles):
@@ -198,8 +217,10 @@ def main():
 	    # slide the tile if it is dropped on another tile
 			    
 		squares[Target.coordinate] = 1
+		print Target.coordinate
 
 		Target = None # Drop item, if we have any
+		
 				
 	    MousePressed = False # Reset these to False
 	    MouseReleased = False # Ditto
