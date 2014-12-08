@@ -70,9 +70,11 @@ def main():
 		    # take the list of x and y coordinates of the palyed tiles
 		    xArr = []
 		    yArr = []
+		    cArr = []
 		    for til in playedTiles:
 			xArr.append(til.coordinate[0])
 			yArr.append(til.coordinate[1])
+			cArr.append((til.coordinate[0],til.coordinate[1]))
 		    
 		    # find the min and max value for x and y coordinate
 		    minX = min(xArr)
@@ -86,13 +88,11 @@ def main():
 		    #range(playedTiles[0].coordinate[0],playedTiles[-1].coordinate[0],36):
 		    # if in the same row all, there will be no gap between the first and last tile
 		    if minY == maxY: # if all played tiles in the same row
-		        print "c 44"
 		        for xCoor in range(minX,maxX,36):
 			    if squares[(xCoor,playedTiles[0].coordinate[1])] == 0:
-			       isAccepted = False
-			       break
+				isAccepted = False
+				break
 		    elif minX == maxX:# if all played tiles in the same column
-			print "c 55"
 			# if in the same column all, there will be no gap between the first and last tile
 			for yCoor in range(minY,maxY,36):
 			    if squares[(playedTiles[0].coordinate[0],yCoor)] == 0:
@@ -100,26 +100,43 @@ def main():
 				break
 		    #played tiles must be same row or same column otherwise not will be accepted
 		    else:
-			print "c 66"
 			isAccepted = False
 		    
 		    # CONTROL for the played tiles are in PLAY AREA or not!!
                     if isAccepted:
-			print "c 11"
+			'''
 			if len(playedTiles) == 1:
+			    
+			    right = (playedTiles[0].coordinate[0]+36,playedTiles[0].coordinate[1])
+			    left = (playedTiles[0].coordinate[0]-36,playedTiles[0].coordinate[1])
+			    up = (playedTiles[0].coordinate[0],playedTiles[i].coordinate[1]-36)
+			    down = (playedTiles[0].coordinate[0],playedTiles[i].coordinate[1]+36)
+			    
 			    if squares[(playedTiles[0].coordinate[0]+36,playedTiles[0].coordinate[1])] == 0 and squares[(playedTiles[0].coordinate[0]-36,playedTiles[0].coordinate[1])] == 0 and squares[(playedTiles[0].coordinate[0],playedTiles[0].coordinate[1]+36)] == 0 and squares[(playedTiles[0].coordinate[0],playedTiles[0].coordinate[1]-36)] == 0 and not isFirstMove:
 				isInPlayArea = False
-			else:
+			'''
+			#else:
+			for i in range(0, len(playedTiles)):
+							
+			    right = (playedTiles[i].coordinate[0]+36,playedTiles[i].coordinate[1])
+			    left = (playedTiles[i].coordinate[0]-36,playedTiles[i].coordinate[1])
+			    up = (playedTiles[i].coordinate[0],playedTiles[i].coordinate[1]-36)
+			    down = (playedTiles[i].coordinate[0],playedTiles[i].coordinate[1]+36)	
+			    
+			    if (right not in cArr and right in squares.keys() and squares[right] == 1) or (left not in cArr  and left in squares.keys() and squares[left] == 1) or (down not in cArr and down in squares.keys() and squares[down] == 1) or (up not in cArr and up in squares.keys() and squares[up] == 1):
+				isInPlayArea = True
+				break
+			    else:
+				isInPlayArea = False			    
+			    '''
 			    for i in range(0, len(playedTiles)-1):
-				print "c aaa"
-				if (squares[(playedTiles[i].coordinate[0]+36,playedTiles[i].coordinate[1])] == 1 and playedTiles[i].coordinate[0]+36 not in xArr) or (squares[(playedTiles[i].coordinate[0]-36,playedTiles[i].coordinate[1])] == 1 and playedTiles[i].coordinate[0]-36 not in xArr) or (squares[(playedTiles[i].coordinate[0],playedTiles[i].coordinate[1]+36)] == 1 and playedTiles[i].coordinate[1]+36 not in yArr) or (squares[(playedTiles[i].coordinate[0],playedTiles[i].coordinate[1]-36)] == 1 and playedTiles[i].coordinate[1]-36 not in yArr):
+				if ((playedTiles[i].coordinate[0]+36,playedTiles[i].coordinate[1]) in squares.keys() and squares[(playedTiles[i].coordinate[0]+36,playedTiles[i].coordinate[1])] == 1 and playedTiles[i].coordinate[0]+36 not in cArr) or ((playedTiles[i].coordinate[0]-36,playedTiles[i].coordinate[1]) in squares.keys() and squares[(playedTiles[i].coordinate[0]-36,playedTiles[i].coordinate[1])] == 1 and playedTiles[i].coordinate[0]-36 not in cArr) or ((playedTiles[i].coordinate[0],playedTiles[i].coordinate[1]+36) in squares.keys() and squares[(playedTiles[i].coordinate[0],playedTiles[i].coordinate[1]+36)] == 1 and playedTiles[i].coordinate[1]+36 not in cArr) or ((playedTiles[i].coordinate[0],playedTiles[i].coordinate[1]-36) in squares.keys() and squares[(playedTiles[i].coordinate[0],playedTiles[i].coordinate[1]-36)] == 1 and playedTiles[i].coordinate[1]-36 not in cArr):
+				    
 				    isInPlayArea = True
-				    print "c 22"
 				    break
 				else:
-				    print "c 33"
 				    isInPlayArea = False
-						  
+			   '''		  
 		      
 		    if isFirstMove and squares[MIDDLE_SQUARE] == 0:
 			print "First move must be done to middle of the board"
