@@ -104,18 +104,6 @@ def main():
 		    
 		    # CONTROL for the played tiles are in PLAY AREA or not!!
                     if isAccepted:
-			'''
-			if len(playedTiles) == 1:
-			    
-			    right = (playedTiles[0].coordinate[0]+36,playedTiles[0].coordinate[1])
-			    left = (playedTiles[0].coordinate[0]-36,playedTiles[0].coordinate[1])
-			    up = (playedTiles[0].coordinate[0],playedTiles[i].coordinate[1]-36)
-			    down = (playedTiles[0].coordinate[0],playedTiles[i].coordinate[1]+36)
-			    
-			    if squares[(playedTiles[0].coordinate[0]+36,playedTiles[0].coordinate[1])] == 0 and squares[(playedTiles[0].coordinate[0]-36,playedTiles[0].coordinate[1])] == 0 and squares[(playedTiles[0].coordinate[0],playedTiles[0].coordinate[1]+36)] == 0 and squares[(playedTiles[0].coordinate[0],playedTiles[0].coordinate[1]-36)] == 0 and not isFirstMove:
-				isInPlayArea = False
-			'''
-			#else:
 			for i in range(0, len(playedTiles)):
 							
 			    right = (playedTiles[i].coordinate[0]+36,playedTiles[i].coordinate[1])
@@ -128,15 +116,6 @@ def main():
 				break
 			    else:
 				isInPlayArea = False			    
-			    '''
-			    for i in range(0, len(playedTiles)-1):
-				if ((playedTiles[i].coordinate[0]+36,playedTiles[i].coordinate[1]) in squares.keys() and squares[(playedTiles[i].coordinate[0]+36,playedTiles[i].coordinate[1])] == 1 and playedTiles[i].coordinate[0]+36 not in cArr) or ((playedTiles[i].coordinate[0]-36,playedTiles[i].coordinate[1]) in squares.keys() and squares[(playedTiles[i].coordinate[0]-36,playedTiles[i].coordinate[1])] == 1 and playedTiles[i].coordinate[0]-36 not in cArr) or ((playedTiles[i].coordinate[0],playedTiles[i].coordinate[1]+36) in squares.keys() and squares[(playedTiles[i].coordinate[0],playedTiles[i].coordinate[1]+36)] == 1 and playedTiles[i].coordinate[1]+36 not in cArr) or ((playedTiles[i].coordinate[0],playedTiles[i].coordinate[1]-36) in squares.keys() and squares[(playedTiles[i].coordinate[0],playedTiles[i].coordinate[1]-36)] == 1 and playedTiles[i].coordinate[1]-36 not in cArr):
-				    
-				    isInPlayArea = True
-				    break
-				else:
-				    isInPlayArea = False
-			   '''		  
 		      
 		    if isFirstMove and squares[MIDDLE_SQUARE] == 0:
 			print "First move must be done to middle of the board"
