@@ -1,3 +1,5 @@
+#import os
+#os.chdir(os.path.dirname(os.path.realpath(__file__)))
 '''
 Generic player object, can be inherited by Human or AI classes which
 execute the actions of the player by either GUI interaction or algorithm
@@ -6,6 +8,7 @@ execute the actions of the player by either GUI interaction or algorithm
 import pygame, time
 import board, tile, bag
 from pygame.locals import *
+FONT = 'data/font/FreeSansBold.ttf'
 
 class Player:
 	
@@ -21,6 +24,7 @@ class Player:
 	FONT_COLOR = (55, 46, 40)
 	BACKGROUND_COLOR = (255, 255, 255)
 	
+
 	TIMEOUT = 15	
 	
 	TRAY_SIZE = 7
@@ -29,7 +33,7 @@ class Player:
 	
 	@staticmethod
 	def initialize():
-		Player.FONT = pygame.font.Font('freesansbold.ttf', 18)
+		Player.FONT = pygame.font.Font(FONT, 18)
 		Player.initialized = True
 		#Player.aiStats = aistats.AIStats()	
 	
@@ -42,6 +46,7 @@ class Player:
 			Player.initialize()
 		
 		self.tray = []  #table of player
+		self.justTray = [] #holds the tiles of the player that are just on the tray not on table
 		self.score = 0
 		self.name = name
 		self.theBoard = theBoard
@@ -81,16 +86,19 @@ class Player:
 	def grab(self):#take a tile from bag
 		
 		if not self.theBag.isEmpty() : #take tile with necessary
-			
 			#Attempt to withdraw the needed number of tiles
 			numNeeded = Player.TRAY_SIZE-len(self.tray)
 			for i in range(numNeeded):
 				newTile = self.theBag.take()
 				if newTile != None:
-					self.tray.append(newTile)#add taken tile to player
+					self.tray.append(newTile) #add taken tile to player
+					self.justTray.append(newTile) 
 			
 		#If the bag was empty AND our tray is empty, signal that play is over		
 		elif len(self.tray) == 0:
 			return False
+		
+		#elif self.theBag.isEmpty() :
+			#return False
 			
 		return True		

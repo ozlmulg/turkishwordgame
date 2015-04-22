@@ -1,7 +1,7 @@
 import pygame,sys
 from pygame.locals import *
 import scrabble,tile
-
+FONT = 'data/font/FreeSansBold.ttf'
 class Board:
 	#board square
 	SQUARE_SIZE = 32
@@ -18,11 +18,11 @@ class Board:
 	TRIPLELETTER = 'tripleletter'
 		
         #colors of the squares
-	BOARD_BACKGROUND = (245, 188, 211)
-	RED = (200, 0, 0)
-	BLUE = (0, 0, 200)
-	PINK = (255, 100, 100)
-	LBLUE = (100, 100, 255)
+	BOARD_BACKGROUND = (223, 236, 255)
+	RED = (217, 28, 32)
+	BLUE = (80,148,216)
+	PINK = (206, 78, 33)
+	LBLUE = (114, 180, 80)
 	
 		
 	def __init__(self):
@@ -41,7 +41,7 @@ class Board:
 			self.squares[x][y] = (None, Board.TRIPLEWORD)
 		
 		doublewords = [(1,1), (2,2), (3,3), (4,4), (1,13), (2,12), (3,11), (4,10),
-		                (13,1), (12,2), (11,3), (10,4), (13,13), (12,12), (11,11), (10,10),(7,7)]
+		                (13,1), (12,2), (11,3), (10,4), (13,13), (12,12), (11,11), (10,10)]
 		for (x, y) in doublewords:
 			self.squares[x][y] = (None, Board.DOUBLEWORD)
 			
@@ -71,7 +71,10 @@ class Board:
 					text = ' '
 				elif(bonus == Board.DOUBLEWORD):
 					color = Board.PINK
-					text = '2xK'
+					if x == 7 and y == 7:
+						text = '*'
+					else:
+						text = '2xK'
 				elif(bonus == Board.TRIPLEWORD):
 					color = Board.RED
 					text = '3xK'
@@ -84,9 +87,8 @@ class Board:
 				else:
 					assert(False)
 					
-				
 				pygame.draw.rect(self.SCREEN, color, (xCorner, yCorner, Board.SQUARE_SIZE, Board.SQUARE_SIZE))				
-				self.SCREEN.blit(pygame.font.Font('freesansbold.ttf', 12).render(text, True, (255,255,255)), (xCorner+4, yCorner+6))	
+				self.SCREEN.blit(pygame.font.Font(FONT, 12).render(text, True, (255,255,255)), (xCorner+4, yCorner+6))	
 				
 			        '''
 				if(tile != None):
