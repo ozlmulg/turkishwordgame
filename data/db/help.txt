@@ -1,0 +1,26 @@
+﻿                                                                       
+                                                                                             
+                                               KELİMELİK OYUN KURALLARI                                                   
+    Kelimelik karşılıklı iki kişinin sıra ile oynadığı bir kelime türetme oyunudur. Oyunda alfabemizdeki  29 harf ve 2 adet de bu harflerden herhangi biri yerine kullanabileceğiniz Joker harf bulunmaktadır.Joker harfler dışındaki tüm harflerin bir puan değeri vardır. Sıra kendisinde olan oyuncu elindeki harfleri en fazla puan alacak şekilde oyun tahtası üzerinde yatay veya dikey olarak yerleştirerek  kelime türetir. Oluşturulan kelimelerin yukarıdan aşağıya ve soldan sağa anlamlı olmaları gerekmektedir.
+    Kelimelik 15x15 hücrelik bir oyun tahtası üzerinde oynanır. Oyunda toplam 100 adet harf bulunmaktadır.Yerdeki taşlar bitene kadar oyunculara her tur 7 adet harf verilir. Yerdeki harfler bittikten sonra elindeki harfleri de bitiren oyuncu ile birlikte oyun biter. Toplamda en fazla puanı sahip oyuncu galip sayılır.                                          
+	                                             
+                                                  HARF YERLEŞTİRME  
+   - Oyuna ilk başlayan oyuncu kelimesini tahtanın ortasında bulunan yıldızlı hücreden geçirmelidir.
+   - Sıra kendinde olan oyuncunun üreteceği yeni kelime tahtada bulunan harflerden en az birine temas edecek şekilde konumlandırılmalıdır.
+   - Üretilen her yeni kelime birbirini takip eden harflerden oluşacak şekilde dikey veya yatay olarak konumlandırılmalıdır.
+   - Komşuluk harfler kullanılarak bir turda birden fazla kelimenin türetilmesi sağlanabilir ancak türetilen her kelime anlamlı olmalıdır.
+   - Komuşuluk ile yapılabilecek örnek kombinasyonlar.
+   
+                                                     PUAN HESAPLAMA
+    Oyuncunun ürettiği bir kelimeden alacağı puan, kelimede kullanılan harflerin üzerinde bulunan sayılara ve kelimenin tahtada konulduğu yere göre hesaplanır. Joker ile oluşturulan harfler ise 0 puana sahip şekilde hesaplamaya katılır. Her harfin puanı harfin türkçe kelimelerdeki kullanım sıklığına göre belirlenmiştir.Oyun tahtası üzerinde bulunan bazı özel bölgeler ise kelimeden alınacak puanı aşağıdaki şekilde etkiler.
+	                                                 ÖZEL HÜCRELER
+    2xH = Üzerinden geçen harfin puanını 2 katına çıkarır.
+    3xH = Üzerinden geçen harfin puanını 3 katına çıkarır.
+    2xK = Üzerinden geçen kelimenin puanını 2 katına çıkarır.
+    3xK = Üzerinden geçen kelimenin puanını 3 katına çıkarır.
+Bir turda birden fazla kelime türetildiğinde her kelimenin puanı harflerin üzerinden geçtiği bonuslara göre ayrı ayrı hesaplanarak toplam puan hesaplanır. Ayrıca kelime türetme sırasında elinizdeki tüm harleri kullanmayı başarırsanız 30 ek puan daha kazanabilirsiniz.
+                                                     BONUS HÜCRELERİ
+Bonus hücresi tahtanın üzerinde her bir oyunda rasgele bir yerde çıkar ve üzerinden geçen bir kelime türetildiğinde kelimeden alınacak puana 25 puan eklenmesini sağlar.
+                                                      OYUNUN BİTİŞİ
+    Ortada ve oyunculardan birinin elinde taş kalmayınca oyun biter. Elinde taş kalan oyuncunun taşlarının puanının toplamı taşlarını önce bitiren oyuncuya eklenirken aynı zamanda elinde taş kalan oyuncudan ceza puanı olarak düşülür. Ortaya çıkan sonuç puanına göre fazla puana sahip oyuncu galip sayılır. Puanların eşit olması durumunda oyun berabere biter.
+    Normal bitiş koşulu dışında bazı özel oyun bitiş şekilleri de vardır. Oyun içerisindeki "teslim ol" seçeneğini seçen oyuncu hükmen yenik sayılır. Oyun sırasında arka arkaya 3 kez pas geçilir ise oyun otomatik olarak biter, puanı fazla olan oyuncu galip sayılır.
