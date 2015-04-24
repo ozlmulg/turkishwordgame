@@ -603,7 +603,7 @@ def changePlayer():
     #elif isinstance(players[active],human.Human):
 	#infoMessage = u"Bilgisayar '%d' puan kazandı. Şimdi oynama sırası sizde.." % (wordPoint)    
 
-    infoMessage = u"%s '%d' puan kazandı. Şimdi sıra %s de.." % (players[currentActive].name,wordPoint,players[active].name)
+    infoMessage = u"%s '%d' puan kazandı. Şimdi sıra %s de.." % (players[currentActive].name, wordPoint, players[active].name)
     
     players[active].drawTray(SCREEN)
     rePaint()
@@ -626,8 +626,10 @@ def aiOperations():
 	
     tkMessageBox.showinfo(title="Tray Letters", message=trayLetters)
     
-    for x in range(15):
-	for y in range(15):
+    for y in range(15):
+	for x in range(15):
+	    if not (x*36+5 <= 509 or y*36+5 <= 509):
+		continue
 	    til = boardTiles[x*36+5, y*36+5]
 	
 	    if not til == None:
@@ -635,9 +637,10 @@ def aiOperations():
 		currLetters = trayLetters + til.letter	# will hold the letters that going to be in process
 		
 		tkMessageBox.showinfo(title="CurLetters init", message=currLetters)
-		tkMessageBox.showinfo(title="Right List", message=getRightAndSubList(til,"right"))
+		#tkMessageBox.showinfo(title="Right List", message=getRightAndSubList(til,"right"))
 		
 		
+		tkMessageBox.showinfo(title="RIGHT", message=til.coordinate[1])
 		rightneighLetters = getRightAndSubList(til,"right")
 		for l in rightneighLetters:
 		    currLetters = currLetters + l[0]
@@ -646,15 +649,16 @@ def aiOperations():
 	    
 		candList = candidateWords(currLetters,til)
 		tkMessageBox.showinfo(title="Candidate Word List", message=candList) 
+		
 
 		maxRight = findMax(til, "R", rightneighLetters, candList)#return (maxP, bestWord, til)
-				
+		
 	        tkMessageBox.showinfo(title="MaxRight", message=maxRight)
 				
 		currLetters = trayLetters + til.letter	# here it stays for reset
 		subneighLetters = getRightAndSubList(til,"sub")
 		for l in subneighLetters:
-		    currLetters = currLetters + l
+		    currLetters = currLetters + l[0]
 		
 		tkMessageBox.showinfo(title="CurLetters after sublist", message=currLetters)
 		
@@ -671,13 +675,19 @@ def aiOperations():
 		if tempBestOp[0] > bestOp:
 		    bestOp = tempBestOp[0] 
 		    bestWord = tempBestOp[1]
+		    bOr = tempBestOp[2][:]
+		    bNL = tempBestOp[3][:]
+		    bTil = til
 		candList = []
 	
 	# ######## en iyi ihtimal burada oynanacak
-
+    placeWord(bestWord, bTil, bOr, bNL)
+    playTheWord()
 
 def findMax(til, orient, neighLetters = [], candidateW = []):
-    global letters, infoMessage,wordPoint,playedTiles
+    global letters, infoMessage, wordPoint, playedTiles
+    bOr = orient[:]
+    bNL = neighLetters[:]
     wList = []
     maxP = 0    # will hold the max point for this tile
     bestWord = "" # will hold the best word option that could be played in the current orientation
@@ -701,89 +711,95 @@ def findMax(til, orient, neighLetters = [], candidateW = []):
 	    wList.append(w)
 			   		
     candidateW = wList[:]
-    tkMessageBox.showinfo(title="Real candidate List", message=candidateW)
     
-    for w in candidateW:
-	word = w[0]
-	tilIndx = w[1]
-	counter = tilIndx  # placement is going to  start	from the "current tiles coordinate - (index of current tile's letter in the current word)" coordinate
-	illegalWordPlacement = False
-	
-	#tkMessageBox.showinfo(title="control0", message=counter)
-	
-	for l in w[0]:
-	    passIt = False
-	    if counter == 0:  # # If it is the current Tile's place then do not set any tile coordinate
-		counter = counter - 1
-		continue
-	     # # If it is the place of one of the neighboor letters of the current tile then do not set any tile coordinate
-	    for nl in neighLetters:
-		if -(counter) == nl[1]:
-		    passIt = True
-		    break
-		
-	    if passIt == True:
-		counter = counter - 1
-		continue
-	    
-	    #tkMessageBox.showinfo(title="control1", message="1")
-		
-	    for t in players[active].tray:        # ### each word on tray that is used in this word is going to be placed on board
-		if unicode(t.letter.lower()) == l:
-		    
-		    #tkMessageBox.showinfo(title="control2", message="2")
-		    
-		    if orient == "R":
-
-			if boardTiles[til.coordinate[0] - (counter)*36, til.coordinate[1]] != None:
-			    illegalWordPlacement = True
-			    break
-			else:
-			    squares[t.coordinate] = 0
-			    t.coordinate = til.coordinate[0] - (counter)*36, til.coordinate[1]
-			    # bunlar teker teker yerlestirildikten sonra played tiles a koyması lazim
-			    tkMessageBox.showinfo(title="Info", message="R-Moving ai tiles to played tiles...")	
-			    playedTiles.append(t)
-			    
-		    
-		    else:
-			if boardTiles[til.coordinate[0], til.coordinate[1] - (counter)*36] != None:
-			    illegalWordPlacement = True
-			    break
-			else:
-			    squares[t.coordinate] = 0
-			    t.coordinate = til.coordinate[0], til.coordinate[1]	- (counter)*36
-			    tkMessageBox.showinfo(title="Info", message="S-Moving ai tiles to played tiles...")	
-			    playedTiles.append(t)
-			
-	    if illegalWordPlacement == True:
-		break
-	    
-	    counter = counter - 1
-	    
-	if illegalWordPlacement == True:
+    for wo in candidateW: 
+	if placeWord(wo, til, orient, neighLetters) == False:	# if there is another tile in one of the squares that word is tried to be placed
+	    for t in players[active].tray:	# gets the tiles back from the table to tray
+		    t.coordinate = t.oldPos	    
 	    continue
 	
-	tkMessageBox.showinfo(title="Played Tiles", message=playedTiles)
-
 	# puan hesaplanip, hepsinin teker teker resetlenmesi, sifirlanmasi ya da ai'in trayine koyulmasi lazim, puan ve kelimenin tutulmasi lazim
 	# burada önceki kelime puan karsilastirilmasi yapilip eger yenisi büyükse maxP ve bestWord ün güncellenmesi lazim
-	if playedTiles and playTheWord() is True and wordPoint > maxP:
-	    bestWord = w
+	if playedTiles and checkWord() is True and wordPoint > maxP:
+	    bestWord = wo
 	    maxP = wordPoint
-	    tkMessageBox.showinfo(title="Played Tiles", message=playedTiles)
-	    tkMessageBox.showinfo(title="WordPoint", message=str(wordPoint))
-	    tkMessageBox.showinfo(title="MaxP", message=str(maxP))		    
+	    bNL = neighLetters[:]
+	    bOr = orient[:]
+	    #tkMessageBox.showinfo(title="WordPoint", message=str(wordPoint))
+	    #tkMessageBox.showinfo(title="MaxP", message=str(maxP))		    
 	    
-	for t in players[active].tray:
-	    t.coordinate = t.oldPos
-       
-    tkMessageBox.showinfo(title="Return FindMax", message="MaxP="+str(maxP)+" BestWord="+str(bestWord))   
-    return (maxP, bestWord, til)	
+	wordPoint = 0	# this global variable is reset for each word
+	
+	for tl in playedTiles:
+	    boardTiles[(tl.coordinate[0], tl.coordinate[1])] = None
+	    if isinstance(players[active],ai.AI):
+		squares[(tl.coordinate[0], tl.coordinate[1])] = 0	
+		
+	for t in players[active].tray:	# point calculation of the current word is done, reset the board by removing the tiles of the word
+		    t.coordinate = t.oldPos	
+	    
+	playedTiles = []    # reset for next word's point calculation
+
+    #tkMessageBox.showinfo(title="Return FindMax", message="MaxP="+str(maxP)+" BestWord="+str(bestWord))   
+    return (maxP, bestWord, bOr, bNL)	
+
+def placeWord(w, tl, ori, neighLets = []):
+    global squares, playedTiles
+    word = w[0]
+    tilIndx = w[1]
+    counter = tilIndx  # placement is going to  start	from the "current tiles coordinate - (index of current tile's letter in the current word)" coordinate
+    illegalWordPlacement = False
+    
+    for l in w[0]:
+	passIt = False
+	if counter == 0:  # # If it is the current Tile's place then do not set any tile coordinate
+	    counter = counter - 1
+	    continue
+	 # # If it is the place of one of the neighboor letters of the current tile then do not set any tile coordinate
+	for nl in neighLets:
+	    if -(counter) == nl[1]:
+		passIt = True
+		break
+	    
+	if passIt == True:
+	    counter = counter - 1
+	    continue
+	    
+	for t in players[active].tray:        # ### each word on tray that is used in this word is going to be placed on board
+	    if unicode(t.letter.lower()) == l:
+
+		if ori == "R":
+
+		    if boardTiles[tl.coordinate[0] - (counter)*36, tl.coordinate[1]] != None:
+			illegalWordPlacement = True
+			break
+		    else:
+			squares[t.coordinate] = 0
+			t.coordinate = tl.coordinate[0] - (counter)*36, tl.coordinate[1]
+			#tkMessageBox.showinfo(title="Info", message="R-Moving ai tiles to played tiles...")	
+			playedTiles.append(t)
+			
+		
+		else:
+		    if boardTiles[tl.coordinate[0], tl.coordinate[1] - (counter)*36] != None:
+			illegalWordPlacement = True
+			break
+		    else:
+			squares[t.coordinate] = 0
+			t.coordinate = tl.coordinate[0], tl.coordinate[1] - (counter)*36
+			#tkMessageBox.showinfo(title="Info", message="S-Moving ai tiles to played tiles...")	
+			playedTiles.append(t)
+		    
+	if illegalWordPlacement == True:
+	    return False
+	
+	counter = counter - 1
+    
+    return True
 
 def getRightAndSubList(tile,type):
-    rightList = [] #keep the tuple like neigbour letter,distance of it to the tile
-    subList = []   #keep the tuple like neigbour letter,distance of it to the tile
+    rightList = [] #keep the tuple like neigbour letter,distance of it to the current tile
+    subList = []   #keep the tuple like neigbour letter,distance of it to the current tile
     
     if type == "right":
 	# right neighbours of a tile 
@@ -807,7 +823,7 @@ def getRightAndSubList(tile,type):
 	  
 	return subList
 
-def candidateWords(letters,til):        # ## BU FONKSIYON DEGISTIRILDI, BU ISIMDEKI FONKSIYONUN YAPTIGI ISI FINDMAX YAPIYOR
+def candidateWords(letters,til):
     letters = unicode(letters.lower())
     candList = []
 				     
@@ -840,13 +856,16 @@ def candidateWords(letters,til):        # ## BU FONKSIYON DEGISTIRILDI, BU ISIMD
     return candList
  
 def playTheWord():
-    global infoMessage,turnMessage,wordAndMeaning,wordPoint,isFirstMove,playedTiles,active,squares,boardTiles,asurf
+    isValidWord = True
+    global infoMessage, turnMessage, wordAndMeaning, wordPoint, isFirstMove, playedTiles, active, squares, boardTiles, asurf
     # Check the Turkish dictionary for the word
-    if checkWord() is True:
+    if not isinstance(players[active], ai.AI):
+	isValidWord = checkWord()
+    if isValidWord:
 	DINGDING.play()
 	infoMessage = wordAndMeaning
 	drawInfoMessage(infoMessage,turnMessage)   
-	players[active].drawTray(SCREEN)#draw tiles of the player ## SILINECEK NOT: BU KOD SATIRININ YERI ONEMLI
+	players[active].drawTray(SCREEN)	#draw tiles of the player 
 	pygame.display.update()
 	pygame.time.wait(2000)
 	wordAndMeaning = ""
@@ -854,19 +873,19 @@ def playTheWord():
 	    isFirstMove = False		    
     # #################save image when the tiles are played#########
 	players[active].drawTray(SCREEN)
-	for Tar in playedTiles:
-	    players[active].tray.remove(Tar)
+	for Targ in playedTiles:
+	    players[active].tray.remove(Targ)
 
 	# # grab new tiles from bag
 	if players[active].grab() == False:
 	    infoMessage= u"Oyun Bitti!"
 	    showGameResult("gameover")
-	# ###################### GET NEW TILES FORM BAG WHEN THE TILES ARE PLACED TO BOARD
+	# ###################### GET NEW TILES FROM BAG WHEN THE TILES ARE PLACED TO BOARD
 	# shows that the positions of the tray is not empty.
 	for t in players[active].tray:
-	    if t.coordinate == (None,None):
+	    if t.coordinate == (None, None):
 		for i in range (player.Player.TRAY_SIZE):
-		    if isinstance(players[active],ai.AI):
+		    if isinstance(players[active], ai.AI):
 			tkMessageBox.showinfo(title="Played Tiles", message="CONTROLLL")
 			coor = (ai.AI.TRAY_FIRSTLEFT + i * (board.Board.SQUARE_SIZE + board.Board.SQUARE_BORDER), ai.AI.TRAY_FIRSTTOP)
 		    else:
@@ -896,8 +915,8 @@ def playTheWord():
 	tile.Tile.TILE_COLOR =  (255, 255, 51)#yellow
 	tile.Tile.TILE_HIGHLIGHT = (100, 100, 255) #blue
 	
-	# TURN TO THE OTHER PLAYER
-	players[active].score+=wordPoint
+	# pass to the next player
+	players[active].score += wordPoint
 	changePlayer()
 	wordPoint=0
 	
@@ -906,19 +925,21 @@ def playTheWord():
     else:
 	infoMessage= u"Geçersiz kelime!"
 	wordAndMeaning = ""
-	wordPoint=0
+	wordPoint = 0
 	for til in playedTiles:
-	    boardTiles[(til.coordinate[0],til.coordinate[1])] = None
+	    boardTiles[(til.coordinate[0], til.coordinate[1])] = None
 	    if isinstance(players[active],ai.AI):
-		squares[(til.coordinate[0],til.coordinate[1])] = 0
+		squares[(til.coordinate[0], til.coordinate[1])] = 0
 	
 	return False  
 #Check database for played word and return true if the word is valid
 def checkWord():
+    global originalWord
+    originalWord= True	# Holds if the "currently played word" is checked, the currently generated word by AI is already taken from Dictionary so for this word dictionary check will not be done
     #showMessage = "playedTiles: "
     #tkMessageBox.showinfo(title="Info Message", message="in checkDictionary")
     # take the list of x and y coordinates of the played tiles
-    global wordPoint,isInBonusSquare
+    #global wordPoint, isInBonusSquare
     isInBonusSquare = False
     xArr = []
     yArr = []
@@ -936,15 +957,12 @@ def checkWord():
     maxY = max(yArr)    
 
     if(minY == maxY): #word is horizontally placed
-	#tkMessageBox.showinfo(title="Info Message", message="in horizontally placed word")
-	if calculateWordPoint(minX,maxX,minY,maxY,"horizontal") == False:#check the word as horizontally
-	    #tkMessageBox.showinfo(title="Info Message", message="return horizontally word-false")
+	if calculateWordPoint(minX,maxX,minY,maxY,"horizontal") == False:  #check the word as horizontally
 	    return False
+	originalWord = False
 	
 	for til in playedTiles:#now check for each new placed letter for connected vertical words
-	    #tkMessageBox.showinfo(title="Info Message", message="in vertically letters for "+til.letter)
 	    if calculateWordPoint(til.coordinate[0],til.coordinate[0],til.coordinate[1],til.coordinate[1],"vertical") == False:
-		#tkMessageBox.showinfo(title="Info Message", message="return false vertically letters for "+til.letter)
 	        return False
 	
     elif(minX == maxX): #word is vertically placed
@@ -952,6 +970,7 @@ def checkWord():
         if calculateWordPoint(minX,maxX,minY,maxY,"vertical") == False:#check the word as vertically
 	    #tkMessageBox.showinfo(title="Info Message", message="return vertically word-false")
 	    return False
+	originalWord = False
 	
 	for til in playedTiles:#now check for each new placed letter for connected horizontal words
 	    #tkMessageBox.showinfo(title="Info Message", message="in horizontally letters for "+til.letter)
@@ -965,7 +984,7 @@ def checkWord():
 
 def calculateWordPoint(minX,maxX,minY,maxY,controlType):
     currentWord = ""
-    global wordPoint,isInBonusSquare
+    global wordPoint, isInBonusSquare, originalWord
     # ############### HORIZONTALLY WORD CONTROL #################################
     if controlType == "horizontal":
 	#tkMessageBox.showinfo(title="Info Message", message="in checkValidWord-horizontally")
@@ -1026,8 +1045,9 @@ def calculateWordPoint(minX,maxX,minY,maxY,controlType):
 	#tkMessageBox.showinfo(title="Info Message", message="after while currentword="+currentWord+"-wordpoint="+str(wordPoint))
 
 	# check the database   
-	if isInTurkishDictionary(currentWord) is False:
-	    return False  
+	if isinstance(players[active], ai.AI) and originalWord == True:	# The currently placed word that AI play is already taken from the dictionary
+	    if isInTurkishDictionary(currentWord) is False:
+		return False  
     # ############### VERTICALLY WORD CONTROL #################################
     elif controlType == "vertical":
 	#tkMessageBox.showinfo(title="Info Message", message="in checkValidWord-vertically")
@@ -1087,8 +1107,9 @@ def calculateWordPoint(minX,maxX,minY,maxY,controlType):
 	#tkMessageBox.showinfo(title="Info Message", message="after while currentword="+currentWord+"-wordpoint="+str(wordPoint))	
 
 	# check the database
-	if isInTurkishDictionary(currentWord) is False:
-	    return False    
+	if isinstance(players[active], ai.AI) and originalWord == True:	# The currently placed word that AI play is already taken from the dictionary
+	    if isInTurkishDictionary(currentWord) is False:
+		return False  
     return True
 
 def controlOfValidMove():
