@@ -15,7 +15,6 @@ pygame.init()
 BG =(149,1,1)
 MIDDLE_SQUARE = (257, 257) #middle point of the board.  
 FONT = None
-#FONT = 'data/font/FreeSansBold.ttf'
 #Simple sound effects
 TIC = pygame.mixer.Sound('data/sound/tic.ogg')
 TICTIC = pygame.mixer.Sound('data/sound/tictic.ogg')
@@ -31,6 +30,8 @@ def run():
     loadImage()
     window = Tk()
     window.wm_withdraw()  
+    #window.geometry("1x1+"+str(window.winfo_screenwidth()/2)+"+"+str(window.winfo_screenheight()/2))
+    #window.geometry("1x1+500+500")
 # #############################################################
     MousePressed=False # Pressed down THIS FRAME
     MouseDown=False # mouse is held down
@@ -68,7 +69,7 @@ def run():
     # shows that the positions of the tray is not empty.    
     for i in range (player.Player.TRAY_SIZE):
 	    squares[human.Human.TRAY_FIRSTLEFT + i * (board.Board.SQUARE_SIZE + board.Board.SQUARE_BORDER), human.Human.TRAY_FIRSTTOP] = 1                    
-            squares[ai.AI.TRAY_FIRSTLEFT + i * (board.Board.SQUARE_SIZE + board.Board.SQUARE_BORDER), ai.AI.TRAY_FIRSTTOP] = 1 
+    
 # ##################### All positions that any tile can be at and their status of occupy, both board and tray 
 
     Target=None # target of Drag/Drop   
@@ -117,13 +118,172 @@ def run():
 			    drawWarnMessage(u"Harf, bir kelimeye değmeli!")
 			    
 			else:
-			    # ###############################################
-			    playTheWord()  			     
+			    # Check the Turkish dictionary for the word
+			    if checkWord() is True:
+				DINGDING.play()
+				infoMessage = wordAndMeaning
+				drawInfoMessage(infoMessage,turnMessage)   
+				players[active].drawTray(SCREEN)#draw tiles of the player ## SILINECEK NOT: BU KOD SATIRININ YERI ONEMLI
+				pygame.display.update()
+				pygame.time.wait(2000)
+				wordAndMeaning = ""
+				if isFirstMove:
+				    isFirstMove = False		    
+			    # #################save image when the tiles are played#########
+				players[active].drawTray(SCREEN)
+				for Tar in playedTiles:
+				    players[active].tray.remove(Tar)
+    
+				# # grab new tiles from bag
+				if players[active].grab() == False:
+				    infoMessage= u"Oyun Bitti!"
+				    showGameResult("gameover")
+				# ###################### GET NEW TILES FORM BAG WHEN THE TILES ARE PLACED TO BOARD
+				# shows that the positions of the tray is not empty.
+				for t in players[active].tray:
+				    if t.coordinate == (None,None):
+					for i in range (player.Player.TRAY_SIZE):
+					    coor = (human.Human.TRAY_FIRSTLEFT + i * (board.Board.SQUARE_SIZE + board.Board.SQUARE_BORDER), human.Human.TRAY_FIRSTTOP)
+					    if squares[coor] == 0:
+						t.setCoordinate(coor)
+						squares[coor] = 1
+						break
+				#  ##############################################################################	    
+				players[active].drawTray(SCREEN)
+				
+				# Change the color of the played tiles
+				tile.Tile.TILE_COLOR = (246, 226, 111) #brown
+				tile.Tile.TILE_HIGHLIGHT =  (246, 226, 111) #brown
+				for Tar in playedTiles:
+				    Tar.draw(True)	
+				    
+				#save image
+				playedTiles = []
+				rect = pygame.Rect(0, 0, 545, 545)
+				sub = SCREEN.subsurface(rect)
+				pygame.image.save(sub, "data/images/Board.png")
+				asurf = pygame.image.load('data/images/Board.png')
+				
+				#color of the current tiles in tray
+				tile.Tile.TILE_COLOR =  (255, 255, 51)#yellow
+				tile.Tile.TILE_HIGHLIGHT = (100, 100, 255) #blue
+				
+				# TURN TO THE OTHER PLAYER
+				players[active].score+=wordPoint
+				changePlayer()
+				wordPoint=0
+				
+				refreshTray()			    
+				
+			    else:
+				infoMessage= u"Geçersiz kelime!"
+				wordAndMeaning = ""
+				wordPoint=0
+				for til in playedTiles:
+				    boardTiles[(til.coordinate[0],til.coordinate[1])] = None			     
 			    #  ##############################################			    
 		    if menu.changeButton.pressed(pygame.mouse.get_pos()):
-			# #####################
-			changeTiles()
-			# #####################
+			
+			if tilebag.isEmpty():
+			    drawWarnMessage(u"Torbada taş kalmadı...")	    
+
+			else:
+			    retrieveBack()
+			    MousePressed = False
+			    change = True
+			    rePaint()	
+			    changedTiles = []
+			    isPressedOk = False
+			    players[active].ISCHANGE = "changing"
+			    while change is True: #show SCREEN until not close
+				# #####################################
+				rePaint()
+				gamemenu.createButtons() #draw game menu				
+				gamemenu.createOkCancelButtons("change") #draw OKANDCANCELBUTTONS  
+				pos=pygame.mouse.get_pos() #get the mouse position
+				for event in pygame.event.get(): #get event from pygame
+				    if event.type == pygame.QUIT: #if user click close button
+					pygame.quit()#finish pygame
+							
+				    if event.type == pygame.MOUSEBUTTONDOWN:
+					MousePressed = True 
+					MouseDown = True 
+						   
+				    if event.type == pygame.MOUSEBUTTONUP:
+					MouseReleased = True
+					MouseDown = False	 
+			
+				    if MousePressed == True:				
+					if menu.cancelButton.pressed(pygame.mouse.get_pos()):
+					    change = False
+					    players[active].ISCHANGE = "finishchanging"
+					    players[active].drawTray(SCREEN)
+					    pygame.display.update()
+					    players[active].ISCHANGE = "no"					    
+					elif menu.okButton.pressed(pygame.mouse.get_pos()) and len(changedTiles)==0:
+					    isPressedOk = True
+					elif menu.okButton.pressed(pygame.mouse.get_pos()) and len(changedTiles)>len(tilebag.tiles):
+					    drawWarnMessage(u"Torbada yalnızca %d taş kaldı.Lütfen değiştirmek istediğiniz %d taşı seçiniz." % (len(tilebag.tiles),len(tilebag.tiles)))			    
+					elif menu.okButton.pressed(pygame.mouse.get_pos()):
+					    for Tar in changedTiles:          
+						players[active].tray.remove(Tar) #firstly we remove the selected tiles from the tray of the player
+
+					    # # grab new tiles from bag
+					    if players[active].grab() == False:
+						infoMessage= u"Torbada taş kalmadı."
+						change = False
+					    
+					    else:
+						for t in changedTiles:
+						    tilebag.putBack(t) #secondly we put back these tiles to the bag
+						
+						i=0
+						for t in players[active].tray:      # then we update their coordinates as same as the ones that removed
+						    if t.coordinate == (None,None):
+							t.coordinate = changedTiles[i].coordinate
+							i = i + 1
+						change = False
+						players[active].ISCHANGE = "finishchanging"
+						players[active].drawTray(SCREEN)
+						pygame.display.update()
+						players[active].ISCHANGE = "no"						
+						changePlayer()
+					    break							    
+					
+					for item in players[active].tray: # search all items
+					    if (pos[0] >= (item.coordinate[0]) and 
+						pos[0] <= (item.coordinate[0] + item.SQUARE_SIZE) and 
+						pos[1] >= (item.coordinate[1]) and 
+						pos[1] <= (item.coordinate[1] + item.SQUARE_SIZE) ): # inside the bounding box
+						Tar = item # "pick up" item
+						if Tar not in changedTiles:
+						    changedTiles.append(Tar)
+						elif Tar in changedTiles:
+						    changedTiles.remove(Tar)
+						#TICTIC.play()
+								    
+				    MousePressed = False # Reset these to False
+				    MouseReleased = False # Ditto
+				    
+				   
+				players[active].drawTray(SCREEN)
+				for t in changedTiles:
+				    pygame.draw.rect(SCREEN, tile.Tile.TILE_HIGHLIGHT, (t.coordinate[0], t.coordinate[1], tile.Tile.SQUARE_SIZE, tile.Tile.SQUARE_SIZE), 2) #highlight the selected tiles
+					
+				pop_change = pygame.image.load('data/images/pop_change.png')
+				if isPressedOk is True and len(changedTiles)==0:
+				    i = 0
+				    while i < 100:
+					SCREEN.blit(pop_change,(150, 200))
+					SCREEN.blit(pygame.font.Font(FONT, 12).render(u"         Lütfen en az bir taş seçiniz ..", True, (78,77,73)), (160, 230))
+					players[active].drawTray(SCREEN)
+					pygame.display.update()
+					i = i + 1
+				    isPressedOk = False
+				elif change:
+			            SCREEN.blit(pygame.font.Font(FONT, 11).render(u"Değiştirmek istediğiniz harfleri seçiniz..", True, (78,77,73)), (160, 230))				    
+				pygame.display.update()
+
 		    if menu.backButton.pressed(pygame.mouse.get_pos()): #retrieves the tiles of the player back to the tray from board
 			# ##################
 			retrieveBack()
@@ -487,124 +647,17 @@ def mixTray():
 	t.coordinate = players[active].justTray[x].coordinate
 	players[active].justTray[x].coordinate = temp   
 
-def changeTiles():
-    global infoMessage,active
-    if tilebag.isEmpty():
-	drawWarnMessage(u"Torbada taş kalmadı...")	    
-
-    else:
-	retrieveBack()
-	MousePressed = False
-	change = True
-	rePaint()	
-	changedTiles = []
-	isPressedOk = False
-	players[active].ISCHANGE = "changing"
-	while change is True: #show SCREEN until not close
-	    # #####################################
-	    rePaint()
-	    gamemenu.createButtons() #draw game menu				
-	    gamemenu.createOkCancelButtons("change") #draw OKANDCANCELBUTTONS  
-	    pos=pygame.mouse.get_pos() #get the mouse position
-	    for event in pygame.event.get(): #get event from pygame
-		if event.type == pygame.QUIT: #if user click close button
-		    pygame.quit()#finish pygame
-				    
-		if event.type == pygame.MOUSEBUTTONDOWN:
-		    MousePressed = True 
-		    MouseDown = True 
-			       
-		if event.type == pygame.MOUSEBUTTONUP:
-		    MouseReleased = True
-		    MouseDown = False	 
-    
-		if MousePressed == True:				
-		    if menu.cancelButton.pressed(pygame.mouse.get_pos()):
-			change = False
-			players[active].ISCHANGE = "finishchanging"
-			players[active].drawTray(SCREEN)
-			pygame.display.update()
-			players[active].ISCHANGE = "no"					    
-		    elif menu.okButton.pressed(pygame.mouse.get_pos()) and len(changedTiles)==0:
-			isPressedOk = True
-		    elif menu.okButton.pressed(pygame.mouse.get_pos()) and len(changedTiles)>len(tilebag.tiles):
-			drawWarnMessage(u"Torbada yalnızca %d taş kaldı.Lütfen değiştirmek istediğiniz %d taşı seçiniz." % (len(tilebag.tiles),len(tilebag.tiles)))			    
-		    elif menu.okButton.pressed(pygame.mouse.get_pos()):
-			for Tar in changedTiles:          
-			    players[active].tray.remove(Tar) #firstly we remove the selected tiles from the tray of the player
-
-			# # grab new tiles from bag
-			if players[active].grab() == False:
-			    infoMessage= u"Torbada taş kalmadı."
-			    change = False
-			
-			else:
-			    for t in changedTiles:
-				tilebag.putBack(t) #secondly we put back these tiles to the bag
-			    
-			    i=0
-			    for t in players[active].tray:      # then we update their coordinates as same as the ones that removed
-				if t.coordinate == (None,None):
-				    t.coordinate = changedTiles[i].coordinate
-				    i = i + 1
-			    change = False
-			    players[active].ISCHANGE = "finishchanging"
-			    players[active].drawTray(SCREEN)
-			    pygame.display.update()
-			    players[active].ISCHANGE = "no"						
-			    changePlayer()
-			break							    
-		    
-		    for item in players[active].tray: # search all items
-			if (pos[0] >= (item.coordinate[0]) and 
-		            pos[0] <= (item.coordinate[0] + item.SQUARE_SIZE) and 
-		            pos[1] >= (item.coordinate[1]) and 
-		            pos[1] <= (item.coordinate[1] + item.SQUARE_SIZE) ): # inside the bounding box
-			    Tar = item # "pick up" item
-			    if Tar not in changedTiles:
-				changedTiles.append(Tar)
-			    elif Tar in changedTiles:
-				changedTiles.remove(Tar)
-			    #TICTIC.play()
-						
-		MousePressed = False # Reset these to False
-		MouseReleased = False # Ditto
-		
-	       
-	    players[active].drawTray(SCREEN)
-	    for t in changedTiles:
-		pygame.draw.rect(SCREEN, tile.Tile.TILE_HIGHLIGHT, (t.coordinate[0], t.coordinate[1], tile.Tile.SQUARE_SIZE, tile.Tile.SQUARE_SIZE), 2) #highlight the selected tiles
-		    
-	    pop_change = pygame.image.load('data/images/pop_change.png')
-	    if isPressedOk is True and len(changedTiles)==0:
-		i = 0
-		while i < 100:
-		    SCREEN.blit(pop_change,(150, 200))
-		    SCREEN.blit(pygame.font.Font(FONT, 12).render(u"         Lütfen en az bir taş seçiniz ..", True, (78,77,73)), (160, 230))
-		    players[active].drawTray(SCREEN)
-		    pygame.display.update()
-		    i = i + 1
-		isPressedOk = False
-	    elif change:
-		SCREEN.blit(pygame.font.Font(FONT, 11).render(u"Değiştirmek istediğiniz harfleri seçiniz..", True, (78,77,73)), (160, 230))				    
-	    pygame.display.update()
-
 def changePlayer():
     global active,turnMessage,infoMessage
-    currentActive = active
     if active == len(players)-1:
 	active = 0
     else:
-	active = active + 1
+	active = active+1
     turnMessage = players[active].name
-    
-    #if isinstance(players[active],ai.AI):
-	#infoMessage = u"%s '%d' puan kazandı. Şimdi Bilgisayar oynuyor.." % (players[0].name,wordPoint)
-    #elif isinstance(players[active],human.Human):
-	#infoMessage = u"Bilgisayar '%d' puan kazandı. Şimdi oynama sırası sizde.." % (wordPoint)    
-
-    infoMessage = u"%s '%d' puan kazandı. Şimdi sıra %s de.." % (players[currentActive].name, wordPoint, players[active].name)
-    
+    if isinstance(players[active],ai.AI):
+	infoMessage = u"%s '%d' puan kazandı. Şimdi Bilgisayar oynuyor.." % (players[0].name,wordPoint)
+    elif isinstance(players[active],human.Human):
+	infoMessage = u"Bilgisayar '%d' puan kazandı. Şimdi oynama sırası sizde.." % (wordPoint)    
     players[active].drawTray(SCREEN)
     rePaint()
 
@@ -626,10 +679,8 @@ def aiOperations():
 	
     tkMessageBox.showinfo(title="Tray Letters", message=trayLetters)
     
-    for y in range(15):
-	for x in range(15):
-	    if not (x*36+5 <= 509 or y*36+5 <= 509):
-		continue
+    for x in range(15):
+	for y in range(15):
 	    til = boardTiles[x*36+5, y*36+5]
 	
 	    if not til == None:
@@ -637,10 +688,9 @@ def aiOperations():
 		currLetters = trayLetters + til.letter	# will hold the letters that going to be in process
 		
 		tkMessageBox.showinfo(title="CurLetters init", message=currLetters)
-		#tkMessageBox.showinfo(title="Right List", message=getRightAndSubList(til,"right"))
+		tkMessageBox.showinfo(title="Right List", message=getRightAndSubList(til,"right"))
 		
 		
-		tkMessageBox.showinfo(title="RIGHT", message=til.coordinate[1])
 		rightneighLetters = getRightAndSubList(til,"right")
 		for l in rightneighLetters:
 		    currLetters = currLetters + l[0]
@@ -649,23 +699,20 @@ def aiOperations():
 	    
 		candList = candidateWords(currLetters,til)
 		tkMessageBox.showinfo(title="Candidate Word List", message=candList) 
-		
 
 		maxRight = findMax(til, "R", rightneighLetters, candList)#return (maxP, bestWord, til)
-		
-	        tkMessageBox.showinfo(title="MaxRight", message=maxRight)
+		os.system("pause")
 				
 		currLetters = trayLetters + til.letter	# here it stays for reset
 		subneighLetters = getRightAndSubList(til,"sub")
 		for l in subneighLetters:
-		    currLetters = currLetters + l[0]
+		    currLetters = currLetters + l
 		
 		tkMessageBox.showinfo(title="CurLetters after sublist", message=currLetters)
 		
 		candList = candidateWords(currLetters,til)
 		maxLeft = findMax(til, "S", subneighLetters, candList)#return (maxP, bestWord, til)
 		
-		tkMessageBox.showinfo(title="MaxSub", message=maxLeft)
 		if maxLeft[0] >= maxRight[0]:
 		    tempBestOp = maxLeft
 		else:
@@ -675,19 +722,13 @@ def aiOperations():
 		if tempBestOp[0] > bestOp:
 		    bestOp = tempBestOp[0] 
 		    bestWord = tempBestOp[1]
-		    bOr = tempBestOp[2][:]
-		    bNL = tempBestOp[3][:]
-		    bTil = til
 		candList = []
 	
 	# ######## en iyi ihtimal burada oynanacak
-    placeWord(bestWord, bTil, bOr, bNL)
-    playTheWord()
+
 
 def findMax(til, orient, neighLetters = [], candidateW = []):
-    global letters, infoMessage, wordPoint, playedTiles
-    bOr = orient[:]
-    bNL = neighLetters[:]
+    global letters, infoMessage,wordPoint
     wList = []
     maxP = 0    # will hold the max point for this tile
     bestWord = "" # will hold the best word option that could be played in the current orientation
@@ -711,95 +752,80 @@ def findMax(til, orient, neighLetters = [], candidateW = []):
 	    wList.append(w)
 			   		
     candidateW = wList[:]
+    tkMessageBox.showinfo(title="Real candidate List", message=candidateW)
     
-    for wo in candidateW: 
-	if placeWord(wo, til, orient, neighLetters) == False:	# if there is another tile in one of the squares that word is tried to be placed
-	    for t in players[active].tray:	# gets the tiles back from the table to tray
-		    t.coordinate = t.oldPos	    
-	    continue
+    for w in candidateW:
+	word = w[0]
+	tilIndx = w[1]
+	counter = tilIndx  # placement is going to  start	from the "current tiles coordinate - (index of current tile's letter in the current word)" coordinate
+	illegalWordPlacement = False
 	
-	# puan hesaplanip, hepsinin teker teker resetlenmesi, sifirlanmasi ya da ai'in trayine koyulmasi lazim, puan ve kelimenin tutulmasi lazim
-	# burada önceki kelime puan karsilastirilmasi yapilip eger yenisi büyükse maxP ve bestWord ün güncellenmesi lazim
-	if playedTiles and checkWord() is True and wordPoint > maxP:
-	    bestWord = wo
-	    maxP = wordPoint
-	    bNL = neighLetters[:]
-	    bOr = orient[:]
-	    #tkMessageBox.showinfo(title="WordPoint", message=str(wordPoint))
-	    #tkMessageBox.showinfo(title="MaxP", message=str(maxP))		    
-	    
-	wordPoint = 0	# this global variable is reset for each word
+	tkMessageBox.showinfo(title="control0", message=counter)
 	
-	for tl in playedTiles:
-	    boardTiles[(tl.coordinate[0], tl.coordinate[1])] = None
-	    if isinstance(players[active],ai.AI):
-		squares[(tl.coordinate[0], tl.coordinate[1])] = 0	
+	for l in w[0]:
+	    passIt = False
+	    if counter == 0:  # # If it is the current Tile's place then do not set any tile coordinate
+		counter = counter - 1
+		continue
+	     # # If it is the place of one of the neighboor letters of the current tile then do not set any tile coordinate
+	    for nl in neighLetters:
+		if -(counter) == nl[1]:
+		    passIt = True
+		    break
 		
-	for t in players[active].tray:	# point calculation of the current word is done, reset the board by removing the tiles of the word
-		    t.coordinate = t.oldPos	
+	    if passIt == True:
+		counter = counter - 1
+		continue
 	    
-	playedTiles = []    # reset for next word's point calculation
+	    tkMessageBox.showinfo(title="control1", message="1")
+		
+	    for t in players[active].tray:        # ### each word on tray that is used in this word is going to be placed on board
+		if unicode(t.letter.lower()) == l:
+		    
+		    tkMessageBox.showinfo(title="control2", message="2")
+		    
+		    if orient == "R":
 
-    #tkMessageBox.showinfo(title="Return FindMax", message="MaxP="+str(maxP)+" BestWord="+str(bestWord))   
-    return (maxP, bestWord, bOr, bNL)	
-
-def placeWord(w, tl, ori, neighLets = []):
-    global squares, playedTiles
-    word = w[0]
-    tilIndx = w[1]
-    counter = tilIndx  # placement is going to  start	from the "current tiles coordinate - (index of current tile's letter in the current word)" coordinate
-    illegalWordPlacement = False
-    
-    for l in w[0]:
-	passIt = False
-	if counter == 0:  # # If it is the current Tile's place then do not set any tile coordinate
-	    counter = counter - 1
-	    continue
-	 # # If it is the place of one of the neighboor letters of the current tile then do not set any tile coordinate
-	for nl in neighLets:
-	    if -(counter) == nl[1]:
-		passIt = True
+			if boardTiles[til.coordinate[0] - (counter)*36, til.coordinate[1]] != None:
+			    illegalWordPlacement = True
+			    break
+			else:
+			    t.coordinate = til.coordinate[0] - (counter)*36, til.coordinate[1]
+			    # bunlar teker teker yerlestirildikten sonra played tiles a koyması lazim
+			    playedTiles.append(t)
+			    
+		    
+		    else:
+			if boardTiles[til.coordinate[0], til.coordinate[1] - (counter)*36] != None:
+			    illegalWordPlacement = True
+			    break
+			else:
+			    t.coordinate = til.coordinate[0], til.coordinate[1]	- (counter)*36
+			    playedTiles.append(t)
+			
+	    if illegalWordPlacement == True:
 		break
 	    
-	if passIt == True:
 	    counter = counter - 1
-	    continue
 	    
-	for t in players[active].tray:        # ### each word on tray that is used in this word is going to be placed on board
-	    if unicode(t.letter.lower()) == l:
-
-		if ori == "R":
-
-		    if boardTiles[tl.coordinate[0] - (counter)*36, tl.coordinate[1]] != None:
-			illegalWordPlacement = True
-			break
-		    else:
-			squares[t.coordinate] = 0
-			t.coordinate = tl.coordinate[0] - (counter)*36, tl.coordinate[1]
-			#tkMessageBox.showinfo(title="Info", message="R-Moving ai tiles to played tiles...")	
-			playedTiles.append(t)
-			
-		
-		else:
-		    if boardTiles[tl.coordinate[0], tl.coordinate[1] - (counter)*36] != None:
-			illegalWordPlacement = True
-			break
-		    else:
-			squares[t.coordinate] = 0
-			t.coordinate = tl.coordinate[0], tl.coordinate[1] - (counter)*36
-			#tkMessageBox.showinfo(title="Info", message="S-Moving ai tiles to played tiles...")	
-			playedTiles.append(t)
-		    
 	if illegalWordPlacement == True:
-	    return False
+	    continue
 	
-	counter = counter - 1
-    
-    return True
+	
+	# puan hesaplanip, hepsinin teker teker resetlenmesi, sifirlanmasi ya da ai'in trayine koyulmasi lazim, puan ve kelimenin tutulmasi lazim
+	if checkWord() is True and wordPoint > maxP:
+	    bestWord = w
+	    maxP = wordPoint
+	    
+	for t in players[active].tray:
+	    t.coordinate = t.oldPos
+	# burada önceki kelime puan karsilastirilmasi yapilip eger yenisi büyükse maxP ve bestWord ün güncellenmesi lazim
+      
+    return (maxP, bestWord, til)	
 
 def getRightAndSubList(tile,type):
-    rightList = [] #keep the tuple like neigbour letter,distance of it to the current tile
-    subList = []   #keep the tuple like neigbour letter,distance of it to the current tile
+    rightList = [] #keep the tuple like neigbour letter,distance of it to the tile
+    subList = []   #keep the tuple like neigbour letter,distance of it to the tile
     
     if type == "right":
 	# right neighbours of a tile 
@@ -823,7 +849,7 @@ def getRightAndSubList(tile,type):
 	  
 	return subList
 
-def candidateWords(letters,til):
+def candidateWords(letters,til):        # ## BU FONKSIYON DEGISTIRILDI, BU ISIMDEKI FONKSIYONUN YAPTIGI ISI FINDMAX YAPIYOR
     letters = unicode(letters.lower())
     candList = []
 				     
@@ -854,92 +880,13 @@ def candidateWords(letters,til):
 	    candList.append((w,index))   # w has the current letter at the index: (w,indx) 
     
     return candList
- 
-def playTheWord():
-    isValidWord = True
-    global infoMessage, turnMessage, wordAndMeaning, wordPoint, isFirstMove, playedTiles, active, squares, boardTiles, asurf
-    # Check the Turkish dictionary for the word
-    if not isinstance(players[active], ai.AI):
-	isValidWord = checkWord()
-    if isValidWord:
-	DINGDING.play()
-	infoMessage = wordAndMeaning
-	drawInfoMessage(infoMessage,turnMessage)   
-	players[active].drawTray(SCREEN)	#draw tiles of the player 
-	pygame.display.update()
-	pygame.time.wait(2000)
-	wordAndMeaning = ""
-	if isFirstMove:
-	    isFirstMove = False		    
-    # #################save image when the tiles are played#########
-	players[active].drawTray(SCREEN)
-	for Targ in playedTiles:
-	    players[active].tray.remove(Targ)
-
-	# # grab new tiles from bag
-	if players[active].grab() == False:
-	    infoMessage= u"Oyun Bitti!"
-	    showGameResult("gameover")
-	# ###################### GET NEW TILES FROM BAG WHEN THE TILES ARE PLACED TO BOARD
-	# shows that the positions of the tray is not empty.
-	for t in players[active].tray:
-	    if t.coordinate == (None, None):
-		for i in range (player.Player.TRAY_SIZE):
-		    if isinstance(players[active], ai.AI):
-			tkMessageBox.showinfo(title="Played Tiles", message="CONTROLLL")
-			coor = (ai.AI.TRAY_FIRSTLEFT + i * (board.Board.SQUARE_SIZE + board.Board.SQUARE_BORDER), ai.AI.TRAY_FIRSTTOP)
-		    else:
-			coor = (human.Human.TRAY_FIRSTLEFT + i * (board.Board.SQUARE_SIZE + board.Board.SQUARE_BORDER), human.Human.TRAY_FIRSTTOP)
-		    if squares[coor] == 0:
-			tkMessageBox.showinfo(title="Played Tiles", message="controllll")
-			t.setCoordinate(coor)
-			squares[coor] = 1
-			break
-	#  ##############################################################################	    
-	players[active].drawTray(SCREEN)
-	
-	# Change the color of the played tiles
-	tile.Tile.TILE_COLOR = (246, 226, 111) #brown
-	tile.Tile.TILE_HIGHLIGHT =  (246, 226, 111) #brown
-	for Tar in playedTiles:
-	    Tar.draw(True)	
-	    
-	#save image
-	playedTiles = []
-	rect = pygame.Rect(0, 0, 545, 545)
-	sub = SCREEN.subsurface(rect)
-	pygame.image.save(sub, "data/images/Board.png")
-	asurf = pygame.image.load('data/images/Board.png')
-	
-	#color of the current tiles in tray
-	tile.Tile.TILE_COLOR =  (255, 255, 51)#yellow
-	tile.Tile.TILE_HIGHLIGHT = (100, 100, 255) #blue
-	
-	# pass to the next player
-	players[active].score += wordPoint
-	changePlayer()
-	wordPoint=0
-	
-	refreshTray()			    
-	return True
-    else:
-	infoMessage= u"Geçersiz kelime!"
-	wordAndMeaning = ""
-	wordPoint = 0
-	for til in playedTiles:
-	    boardTiles[(til.coordinate[0], til.coordinate[1])] = None
-	    if isinstance(players[active],ai.AI):
-		squares[(til.coordinate[0], til.coordinate[1])] = 0
-	
-	return False  
+   
 #Check database for played word and return true if the word is valid
 def checkWord():
-    global originalWord
-    originalWord= True	# Holds if the "currently played word" is checked, the currently generated word by AI is already taken from Dictionary so for this word dictionary check will not be done
     #showMessage = "playedTiles: "
     #tkMessageBox.showinfo(title="Info Message", message="in checkDictionary")
     # take the list of x and y coordinates of the played tiles
-    #global wordPoint, isInBonusSquare
+    global wordPoint,isInBonusSquare
     isInBonusSquare = False
     xArr = []
     yArr = []
@@ -947,7 +894,6 @@ def checkWord():
 	xArr.append(til.coordinate[0])
 	yArr.append(til.coordinate[1])
 	boardTiles[(til.coordinate[0],til.coordinate[1])] = til
-	squares[(til.coordinate[0],til.coordinate[1])] = 1
 	#showMessage = showMessage +","+unicode(til.letter)
     #tkMessageBox.showinfo(title="Info Message", message=showMessage)
     # find the min and max value for x and y coordinate
@@ -957,12 +903,15 @@ def checkWord():
     maxY = max(yArr)    
 
     if(minY == maxY): #word is horizontally placed
-	if calculateWordPoint(minX,maxX,minY,maxY,"horizontal") == False:  #check the word as horizontally
+	#tkMessageBox.showinfo(title="Info Message", message="in horizontally placed word")
+	if calculateWordPoint(minX,maxX,minY,maxY,"horizontal") == False:#check the word as horizontally
+	    #tkMessageBox.showinfo(title="Info Message", message="return horizontally word-false")
 	    return False
-	originalWord = False
 	
 	for til in playedTiles:#now check for each new placed letter for connected vertical words
+	    #tkMessageBox.showinfo(title="Info Message", message="in vertically letters for "+til.letter)
 	    if calculateWordPoint(til.coordinate[0],til.coordinate[0],til.coordinate[1],til.coordinate[1],"vertical") == False:
+		#tkMessageBox.showinfo(title="Info Message", message="return false vertically letters for "+til.letter)
 	        return False
 	
     elif(minX == maxX): #word is vertically placed
@@ -970,7 +919,6 @@ def checkWord():
         if calculateWordPoint(minX,maxX,minY,maxY,"vertical") == False:#check the word as vertically
 	    #tkMessageBox.showinfo(title="Info Message", message="return vertically word-false")
 	    return False
-	originalWord = False
 	
 	for til in playedTiles:#now check for each new placed letter for connected horizontal words
 	    #tkMessageBox.showinfo(title="Info Message", message="in horizontally letters for "+til.letter)
@@ -984,7 +932,7 @@ def checkWord():
 
 def calculateWordPoint(minX,maxX,minY,maxY,controlType):
     currentWord = ""
-    global wordPoint, isInBonusSquare, originalWord
+    global wordPoint,isInBonusSquare
     # ############### HORIZONTALLY WORD CONTROL #################################
     if controlType == "horizontal":
 	#tkMessageBox.showinfo(title="Info Message", message="in checkValidWord-horizontally")
@@ -1045,9 +993,8 @@ def calculateWordPoint(minX,maxX,minY,maxY,controlType):
 	#tkMessageBox.showinfo(title="Info Message", message="after while currentword="+currentWord+"-wordpoint="+str(wordPoint))
 
 	# check the database   
-	if isinstance(players[active], ai.AI) and originalWord == True:	# The currently placed word that AI play is already taken from the dictionary
-	    if isInTurkishDictionary(currentWord) is False:
-		return False  
+	if isInTurkishDictionary(currentWord) is False:
+	    return False  
     # ############### VERTICALLY WORD CONTROL #################################
     elif controlType == "vertical":
 	#tkMessageBox.showinfo(title="Info Message", message="in checkValidWord-vertically")
@@ -1107,9 +1054,8 @@ def calculateWordPoint(minX,maxX,minY,maxY,controlType):
 	#tkMessageBox.showinfo(title="Info Message", message="after while currentword="+currentWord+"-wordpoint="+str(wordPoint))	
 
 	# check the database
-	if isinstance(players[active], ai.AI) and originalWord == True:	# The currently placed word that AI play is already taken from the dictionary
-	    if isInTurkishDictionary(currentWord) is False:
-		return False  
+	if isInTurkishDictionary(currentWord) is False:
+	    return False    
     return True
 
 def controlOfValidMove():
