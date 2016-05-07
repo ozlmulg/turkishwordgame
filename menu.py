@@ -9,7 +9,7 @@ def main():
     mainmenu = slidemenu.run()
     mainmenu.runm()      
 
-BG =(149,1,1)
+BG =(132,24,2)
 FONT = pygame.font.SysFont("comicsansms", 16)
 FONT2 = pygame.font.Font('data/font/FreeSansBold.ttf', 16)
 imgplay = pygame.image.load('data/images/play.png')
@@ -92,7 +92,7 @@ class GameMenu():
 	    popup = pop_exit	
 	SCREEN.blit(popup,(150, 200))
 
-    def drawGameResult(self,humanScore,aiScore,type):
+    def drawGameResult(self,humanScore,aiScore,type,remainingTilesPoints):
 	global closeButton,againButton
 	closeButton = button.Button()
 	againButton = button.Button()
@@ -107,6 +107,9 @@ class GameMenu():
 	        result = gameresult_win
 	    else:
 		result = gameresult_draw
+		
 	SCREEN.blit(result,(150, 200))
 	SCREEN.blit(FONT2.render(str(humanScore), True, (0,0,0)), (350, 274))
-	SCREEN.blit(FONT2.render(str(aiScore), True, (0,0,0)), (350, 312))		
+	SCREEN.blit(FONT2.render(str(aiScore), True, (0,0,0)), (350, 312))	
+	if type == "gameover" and remainingTilesPoints != 0:
+	    SCREEN.blit(FONT2.render(u"Ceza puaný:"+str(remainingTilesPoints), True, (255,0,0)), (200, 352))

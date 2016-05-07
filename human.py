@@ -1,9 +1,4 @@
 # -*- coding: cp1254 -*-
-'''
-This class extends the basic player class to implement actions using the GUI
-so that a human-controlled player can make moves
-'''
-
 import pygame, player, tile
 
 class Human(player.Player): # extends Player
@@ -21,8 +16,8 @@ class Human(player.Player): # extends Player
 	'''
 	Initialize the human-controlled player (currently does nothing but call's player initialization)
 	'''
-	def __init__(self, name, theBoard, theBag, theHeuristic = None):
-		player.Player.__init__(self, name, theBoard, theBag, 10.0, theHeuristic)
+	def __init__(self, name, theBoard, theBag):
+		player.Player.__init__(self, name, theBoard, theBag)
 		self.hand = -1
 		
 	'''
@@ -106,38 +101,6 @@ class Human(player.Player): # extends Player
 				t.draw(highlight)	
 				i += 1		
 	
-		
-		'''
-		#Draw a basic tray
-		if self.ISCHANGE is False:
-			pygame.draw.rect(SCREEN, Human.TRAY_COLOR, (Human.TRAY_LEFT, Human.TRAY_TOP, 
-				                        (tile.Tile.SQUARE_SIZE + tile.Tile.SQUARE_BORDER)*8, 
-				                        tile.Tile.SQUARE_SIZE + tile.Tile.SQUARE_BORDER*2))
-			
-			pygame.draw.rect(SCREEN, Human.TRAY_BOTTOM_COLOR, (Human.TRAY_LEFT-5, Human.TRAY_TOP+37, 
-				                        (tile.Tile.SQUARE_SIZE + tile.Tile.SQUARE_BORDER)*8+10,10))			
-			
-			for i in range(0,8):
-				pygame.draw.rect(SCREEN, Human.TRAY_BOTTOM_COLOR, (Human.TRAY_LEFT+17+i*36, Human.TRAY_TOP+30,3,10))			
-
-		#Draw each tile
-		i = 0
-		for t in self.tray:
-			if self.FIRST_TIME == True:
-				top = Human.TRAY_FIRSTTOP
-				left = (Human.TRAY_FIRSTLEFT + (i * (tile.Tile.SQUARE_SIZE + tile.Tile.SQUARE_BORDER)))
-				t.setCoordinate((left,top))
-			
-			if i == self.hand:
-				highlight = True
-			else:
-				highlight = False
-			
-			t.draw(highlight)	
-			i += 1
-			
-		self.FIRST_TIME=False
-		'''
 # #####################################
 	def getTray(self):
 		self.tray

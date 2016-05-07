@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import pygame, random
 import tile
-SEED = 448
+#SEED = 448
 class Bag:
 	
 	def __init__(self):
 		self.tiles = []
-		self.TurkishCharList = []
+		#self.TurkishCharList = []
 		
 		#tiles
 		self.add('A', 1, 12)
@@ -56,7 +56,7 @@ class Bag:
 		return False
 		
 	def shuffle(self):
-		random.seed(SEED)
+		#random.seed(SEED)
 		random.shuffle(self.tiles)
 		
 	def putBack(self, tile):
@@ -65,5 +65,5 @@ class Bag:
 	def add(self, letter, points, n):# n = number of letter in bag
 		for i in range(n):
 			self.tiles.append(tile.Tile(letter, points ,(None,None)))
-		self.TurkishCharList.append(unicode(letter.lower()))
+		#self.TurkishCharList.append(unicode(letter.lower()))
 		

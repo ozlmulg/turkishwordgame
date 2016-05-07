@@ -107,7 +107,7 @@ def menu(menu, pos='center', font1=None, font2=None, color1=(128, 128, 128), col
     event.post(
         event.Event(MOUSEMOTION, {'pos': mpos.topleft if mpos.collidelistall(menu) else menu[0].center}))
     idx = -1
-    display.set_caption("TURKISH WORD GAME")
+    display.set_caption("KELiME OYUNU")
 
     while True:
 
@@ -161,20 +161,19 @@ class run(object):
         f = font.Font(join('data/font/FEASFBRG.ttf'), 85)
         f1 = font.Font(join('data/font/FEASFBRG.ttf'), 95)
         f2 = font.Font(join('data/font/FEASFBRG.ttf'), 75) 
-        mainmenu = f.render('TURKISH WORD GAME', 1, (102,51, 0))
+        mainmenu = f.render('KELiME OYUNU', 1, (255,192, 0))
         r = mainmenu.get_rect()
         r.centerx, r.top = 400, 100
         
         #background_main = image.load('data/images/bg.png').convert()
         #scr.blit(background_main, (0,0))
-	
-	scr.fill((0,0,0)) # clear screen
+	scr.fill((132,24,2)) # clear screen
 	
         bg = scr.copy()
         scr.blit(mainmenu, r)
         display.flip()
     
-	menu1 = {"menu": ['PLAY', 'ABOUT','DEMO', 'EXIT'], "font1": f2,"font2": f1, "pos":
+	menu1 = {"menu": ['OYNA', 'YARDIM','DEMO', 'KAPAT'], "font1": f2,"font2": f1, "pos":
 		 'center', "color1": (154, 180, 61), "light": 6, "speed": 200, "lag": 20}
 
         menus = (menu1)
@@ -186,15 +185,15 @@ class run(object):
 	    if resp == "re-show":
 		resp = menu(**menu1)[0]
 	    
-	    if resp == 'PLAY':
-		scrabble.run()  
+	    if resp == 'OYNA':
+		scrabble.run(False)  
 	
-	    if resp == 'ABOUT':
+	    if resp == 'YARDIM':
                 help.showHelp()
 		
 	    if resp == 'DEMO':
-	        scrabble.run()	    
+	        scrabble.run(True)	    
 
-	    if resp == 'EXIT':
+	    if resp == 'KAPAT':
 		pygame.quit()
 		sys.exit()
