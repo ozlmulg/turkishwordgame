@@ -90,8 +90,3 @@ class Board:
 				pygame.draw.rect(self.SCREEN, color, (xCorner, yCorner, Board.SQUARE_SIZE, Board.SQUARE_SIZE))				
 				self.SCREEN.blit(pygame.font.Font(FONT, 12).render(text, True, (255,255,255)), (xCorner+4, yCorner+6))	
 				
-			        '''
-				if(tile != None):
-					tile.draw(xCorner, yCorner, False)		
-				'''	
-								

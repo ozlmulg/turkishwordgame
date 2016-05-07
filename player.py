@@ -1,10 +1,3 @@
-#import os
-#os.chdir(os.path.dirname(os.path.realpath(__file__)))
-'''
-Generic player object, can be inherited by Human or AI classes which
-execute the actions of the player by either GUI interaction or algorithm
-'''
-
 import pygame, time
 import board, tile, bag
 from pygame.locals import *
@@ -41,7 +34,7 @@ class Player:
 	'''
 	Initialize a new player with a tray and score
 	'''
-	def __init__(self, name, theBoard, theBag, theDifficulty = 10.0, theHeuristic = None):
+	def __init__(self, name, theBoard, theBag):
 		if not Player.initialized:
 			Player.initialize()
 		
@@ -53,15 +46,6 @@ class Player:
 		self.theBag = theBag
 		self.lastScorePulse = 0
 		self.lastScore = 0
-		
-		#self.usageLimit = self.theBoard.dictionary.difficultyToUsage(theDifficulty)
-		
-		#print str(theDifficulty)+", "+str(self.usageLimit)
-		
-		#if theHeuristic == None:
-			#self.heuristic = heuristic.Heuristic()
-		#else:
-			#self.heuristic = theHeuristic
 		
 		##start with a full set of tiles
 		self.grab()

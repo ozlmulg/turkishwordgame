@@ -7601,7 +7601,7 @@ diktirmek
 diktirtme
 diktirtmek
 dil
-dilalt
+dilaltı
 dilatometre
 dilaver
 dilbasan

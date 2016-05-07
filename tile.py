@@ -9,7 +9,6 @@ class Tile:
     TILE_OUTLINE = (55, 46, 40)
     TILE_HIGHLIGHT = (100, 100, 255) 
     TILE_BLANK = (110, 92, 80)
-    #TILE_COLOR = (255, 179, 24)
     TILE_COLOR = (255, 255, 51)
 
     def __init__(self, letter, points,coordinate):
@@ -22,10 +21,11 @@ class Tile:
 	    
     def draw(self, highlight = False):
 	    SCREEN = scrabble.getScreen()
-	    #LETTER_FONT = pygame.font.Font('freesansbold.ttf', 24)
-	    #POINTS_FONT = pygame.font.Font('freesansbold.ttf', 7)   	
-	    LETTER_FONT = pygame.font.Font(FONT, 24)
-	    POINTS_FONT = pygame.font.Font(FONT, 7) 	    
+	    LETTER_FONT = pygame.font.Font('freesansbold.ttf', 24)
+	    POINTS_FONT = pygame.font.Font('freesansbold.ttf', 7)   	
+	    #LETTER_FONT = pygame.font.Font(FONT, 24)
+	    #POINTS_FONT = pygame.font.Font(FONT, 7) 	
+	    
 	    if highlight:
 		    pygame.draw.rect(SCREEN, Tile.TILE_HIGHLIGHT, (self.coordinate[0], self.coordinate[1], Tile.SQUARE_SIZE, Tile.SQUARE_SIZE))
 	    else:
@@ -48,7 +48,7 @@ class Tile:
 	    pointsRect = pointsText.get_rect()
 	    pointsRect.center = (self.coordinate[0] + Tile.SQUARE_SIZE/2 + Tile.SQUARE_SIZE/3, self.coordinate[1] + Tile.SQUARE_SIZE/2 + Tile.SQUARE_SIZE/3)
 	    SCREEN.blit(pointsText, pointsRect)
-	
+	    
 # #####################################   	    
     def setCoordinate(self,coordinate):
             self.coordinate = coordinate
